@@ -11,9 +11,28 @@ export const AdoptionModal = ({ pet, isOpen, onClose }) => {
   if (!pet) return null;
 
   const telefone = '5554996546910';
-  const mensagem = encodeURIComponent(
-    `Olá equipe da APIA! Tenho muito interesse em adotar o(a) pet *${pet.name}* (${pet.species === 'cachorro' ? 'Cachorro' : 'Gato'}, porte ${pet.size}, ${pet.age}). Li os requisitos de pátio fechado, maioridade e termo de responsabilidade no site e gostaria de dar início ao processo de adoção!`
-  );
+  const especieLabel = pet.species === 'cachorro' ? 'Cachorro' : 'Gato';
+  const textoMensagem = [
+    '🐾 *SOLICITAÇÃO DE ADOÇÃO* 🐾',
+    '',
+    'Olá, equipe da APIA! Tenho interesse em adotar um pet e gostaria de iniciar o processo de adoção responsável.',
+    '',
+    '📋 *Dados do Pet:*',
+    `• *Nome:* ${pet.name}`,
+    `• *Espécie:* ${especieLabel}`,
+    `• *Porte:* ${pet.size}`,
+    `• *Idade:* ${pet.age}`,
+    '',
+    '✅ *Requisitos Obrigatórios para Adoção Responsável (Aceitos):*',
+    '• *Pátio Seguro e Fechado:* Para a segurança do pet contra atropelamentos e fugas, priorizamos residências sem rotas de fuga.',
+    '• *Maioridade Legal:* O responsável pela adoção deve ser maior de 18 anos e apresentar documento de identificação.',
+    '• *Termo de Responsabilidade:* Assinatura de termo formal concordando com cuidados veterinários, vacinação e carinho.',
+    '• *Acompanhamento APIA:* Nossa equipe fará contato inicial após a adoção para checar a adaptação do pet.',
+    '',
+    '✍️ *Declaração de Concordância:*',
+    '_Compreendo os requisitos da ONG APIA e afirmo possuir condições estruturais e financeiras para acolher o pet com responsabilidade._',
+  ].join('\n');
+  const mensagem = encodeURIComponent(textoMensagem);
   const urlWhatsApp = `https://wa.me/${telefone}?text=${mensagem}`;
 
   return (
