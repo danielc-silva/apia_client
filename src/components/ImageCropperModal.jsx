@@ -45,8 +45,27 @@ export const ImageCropperModal = ({
 
   if (!imageSrc) return null;
 
+  const estaRotacionado = rotacao % 180 !== 0;
+  const larguraEfetiva = estaRotacionado ? tamanhoNatural.height : tamanhoNatural.width;
+  const alturaEfetiva = estaRotacionado ? tamanhoNatural.width : tamanhoNatural.height;
+
   const obterDimensoesQuadro = () => {
     switch (proporcao) {
+      case 'original': {
+        const largNat = larguraEfetiva || 360;
+        const altNat = alturaEfetiva || 270;
+        const maxQuadroW = 384;
+        const maxQuadroH = 300;
+        const escalaQuadro = Math.min(maxQuadroW / largNat, maxQuadroH / altNat);
+        const maxFinal = 1280;
+        const escalaFinal = Math.min(1, maxFinal / Math.max(largNat, altNat));
+        return {
+          larguraQuadro: Math.max(60, Math.round(largNat * escalaQuadro)),
+          alturaQuadro: Math.max(60, Math.round(altNat * escalaQuadro)),
+          larguraFinal: Math.max(100, Math.round(largNat * escalaFinal)),
+          alturaFinal: Math.max(100, Math.round(altNat * escalaFinal)),
+        };
+      }
       case '16:9':
         return { larguraQuadro: 384, alturaQuadro: 216, larguraFinal: 1280, alturaFinal: 720 };
       case '1:1':
@@ -63,10 +82,6 @@ export const ImageCropperModal = ({
     const img = evento.currentTarget;
     setTamanhoNatural({ width: img.naturalWidth, height: img.naturalHeight });
   };
-
-  const estaRotacionado = rotacao % 180 !== 0;
-  const larguraEfetiva = estaRotacionado ? tamanhoNatural.height : tamanhoNatural.width;
-  const alturaEfetiva = estaRotacionado ? tamanhoNatural.width : tamanhoNatural.height;
 
   const escalaEncaixe =
     Math.max(larguraQuadro / (larguraEfetiva || 1), alturaQuadro / (alturaEfetiva || 1)) || 1;
@@ -223,12 +238,18 @@ export const ImageCropperModal = ({
           </span>
         </div>
       ) : (
-        <div className="bg-light px-4 py-2 border-bottom d-flex align-items-center justify-content-between small">
+        <div className="bg-light px-4 py-2 border-bottom d-flex flex-wrap align-items-center justify-content-between gap-2 small">
           <span className="fw-semibold text-secondary d-flex align-items-center gap-1">
             <Maximize2 size={14} className="text-apia-dark" />
             Formato da Foto:
           </span>
           <ButtonGroup size="sm">
+            <Button
+              variant={proporcao === 'original' ? 'success' : 'outline-secondary'}
+              onClick={() => alterarProporcao('original')}
+            >
+              Original
+            </Button>
             <Button
               variant={proporcao === '16:9' ? 'success' : 'outline-secondary'}
               onClick={() => alterarProporcao('16:9')}

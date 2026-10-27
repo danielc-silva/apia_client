@@ -914,8 +914,8 @@ export const AdminDashboard = () => {
                   <img
                     src={formularioEvento.photoUrl}
                     alt="Prévia do Evento"
-                    className="rounded-3 border object-fit-cover flex-shrink-0"
-                    style={{ width: '140px', height: '80px' }}
+                    className="rounded-3 border bg-white flex-shrink-0"
+                    style={{ width: 'auto', height: 'auto', maxWidth: '140px', maxHeight: '100px', objectFit: 'contain' }}
                   />
                 ) : (
                   <div
@@ -946,7 +946,7 @@ export const AdminDashboard = () => {
                     {formularioEvento.photoUrl ? 'Substituir / Ajustar Foto' : 'Escolher Foto do Aparelho'}
                   </Button>
                   <div className="small text-muted" style={{ fontSize: '0.72rem' }}>
-                    Formato paisagem ou quadrado ajustável na ferramenta de corte.
+                    Mantém o formato original ou permite ajuste na ferramenta de corte.
                   </div>
                 </div>
               </div>
@@ -1002,7 +1002,7 @@ export const AdminDashboard = () => {
             : 'Ajustar Foto do Evento / Notícia'
         }
         imageSrc={imagemOriginalUrl || ''}
-        initialAspectRatio={alvoCorte === 'animal' ? '1:1' : '16:9'}
+        initialAspectRatio={alvoCorte === 'animal' ? '1:1' : 'original'}
         lockAspectRatio={alvoCorte === 'animal'}
         isOpen={modalCorteAberto}
         onClose={() => setModalCorteAberto(false)}
