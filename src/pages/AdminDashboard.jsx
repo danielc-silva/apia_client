@@ -408,7 +408,7 @@ export const AdminDashboard = () => {
         <Col xs={6} md={3}>
           <Card className="border-0 shadow-sm rounded-4 p-3 h-100">
             <small className="text-uppercase fw-bold text-success" style={{ fontSize: '0.7rem' }}>
-              Finais Felizes ❤️
+              Finais Felizes
             </small>
             <div className="h3 fw-bold text-success mb-0 mt-1">{totalAdotados}</div>
           </Card>
@@ -469,7 +469,7 @@ export const AdminDashboard = () => {
                   variant={filtroAnimais === 'adotado' ? 'success' : 'outline-secondary'}
                   onClick={() => setFiltroAnimais('adotado')}
                 >
-                  Finais Felizes ❤️
+                  Finais Felizes
                 </Button>
               </ButtonGroup>
 
@@ -495,7 +495,7 @@ export const AdminDashboard = () => {
 
           <Card className="border-0 shadow-sm rounded-4 overflow-hidden">
             {carregandoAnimais ? (
-              <div className="p-5 text-center small text-muted">Carregando lista de patudos...</div>
+              <div className="p-5 text-center small text-muted">Carregando lista de animaiss...</div>
             ) : erroAnimais ? (
               <Alert variant="danger" className="m-3">
                 <p className="mb-3">Não foi possível carregar os animais: {erroAnimais}</p>
@@ -526,7 +526,7 @@ export const AdminDashboard = () => {
                         <div className="d-flex align-items-center gap-2 mb-1">
                           <h6 className="fw-bold text-apia-dark mb-0">{pet.name}</h6>
                           <Badge bg={pet.status === 'adotado' ? 'success' : 'warning'} text={pet.status === 'adotado' ? 'light' : 'dark'}>
-                            {pet.status === 'adotado' ? 'Adotado (Final Feliz)' : 'Disponível'}
+                            {pet.status === 'adotado' ? 'Adotado' : 'Disponível'}
                           </Badge>
                         </div>
                         <div className="small text-muted">
@@ -547,7 +547,6 @@ export const AdminDashboard = () => {
                         onClick={() => alternarStatusAnimal(pet)}
                         className="d-inline-flex align-items-center gap-1 fw-semibold"
                       >
-                        <Sparkles size={14} />
                         {pet.status === 'disponivel' ? 'Marcar como Adotado' : 'Voltar para Disponível'}
                       </Button>
 

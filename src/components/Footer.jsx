@@ -94,7 +94,7 @@ export const Footer = () => {
           <Col md={4} className="text-md-end">
             <h5 className="fw-bold fs-6 mb-2">Juntos por mais vidas!</h5>
             <p className="small text-light opacity-75 mb-3">
-              Desenvolvido em parceria com o curso de Ciência da Computação do IFSUL (Práticas em Sociedade III).
+              Desenvolvido em parceria com o curso de<br/> Ciência da Computação do IFSUL.
             </p>
             <div className="mb-3">
               <img

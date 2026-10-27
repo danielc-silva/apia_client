@@ -7,7 +7,7 @@ import { ChevronLeft, ChevronRight, Heart, Sparkles, PawPrint } from 'lucide-rea
 export const HappyTailsCarousel = ({
   pets = [],
   title = 'Finais Felizes',
-  subtitle = 'Graças ao apoio da nossa comunidade, esses patudos foram adotados e hoje vivem com segurança e dignidade.',
+  subtitle = 'Graças ao apoio da nossa comunidade, esses animais foram adotados e hoje vivem com segurança e dignidade.',
 }) => {
   const [indiceAtual, setIndiceAtual] = useState(0);
   const [itensPorPagina, setItensPorPagina] = useState(4);
@@ -155,13 +155,6 @@ export const HappyTailsCarousel = ({
                           className="pet-photo-square"
                           loading="lazy"
                         />
-                        <div
-                          className="position-absolute bottom-0 start-0 end-0 m-2 py-1 px-2 rounded-2 text-white text-center small fw-semibold d-flex align-items-center justify-content-center gap-1"
-                          style={{ backgroundColor: 'rgba(22, 53, 38, 0.85)', fontSize: '0.75rem' }}
-                        >
-                          <Heart size={13} color="#ff6b81" fill="#ff6b81" />
-                          Adotado(a)! Final Feliz
-                        </div>
                       </div>
                       <Card.Body className="p-3 text-center">
                         <h6 className="fw-bold text-apia-dark mb-1">{pet.name}</h6>

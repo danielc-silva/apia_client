@@ -20,7 +20,6 @@ export const AdoptionModal = ({ pet, isOpen, onClose }) => {
     <Modal show={isOpen} onHide={onClose} centered>
       <Modal.Header closeButton closeVariant="white" className="bg-apia-dark text-white border-0">
         <div className="d-flex align-items-center gap-2">
-          <Heart size={20} color="#DE5A3A" fill="#DE5A3A" />
           <div>
             <Modal.Title className="fs-6 fw-bold mb-0">
               Processo de Adoção: {pet.name}
