@@ -1,4 +1,34 @@
-const API_BASE_URL = import.meta.env.VITE_API_URL || '/api';
+const RENDER_BACKEND_URL = 'https://webservices-ongapia.onrender.com';
+
+function obterApiBaseUrl() {
+  const envUrl = (import.meta.env.VITE_API_URL || '').trim().replace(/\/+$/, '');
+  if (!envUrl) {
+    return import.meta.env.PROD ? `${RENDER_BACKEND_URL}/api` : '/api';
+  }
+  if (envUrl.startsWith('http') && !envUrl.endsWith('/api')) {
+    return `${envUrl}/api`;
+  }
+  return envUrl;
+}
+
+const API_BASE_URL = obterApiBaseUrl();
+const BACKEND_ORIGIN = (
+  import.meta.env.VITE_BACKEND_URL ||
+  (API_BASE_URL.startsWith('http') ? API_BASE_URL.replace(/\/api$/, '') : '')
+).replace(/\/+$/, '');
+
+function normalizarItem(item) {
+  if (!item || typeof item !== 'object') return item;
+  const photoUrl = item.photoUrl || item.photo_url;
+  if (typeof photoUrl === 'string' && photoUrl.startsWith('/uploads/') && BACKEND_ORIGIN) {
+    return { ...item, photoUrl: `${BACKEND_ORIGIN}${photoUrl}` };
+  }
+  return item;
+}
+
+function normalizarLista(lista) {
+  return Array.isArray(lista) ? lista.map(normalizarItem) : [];
+}
 
 // Retorna os headers de autorização com o token JWT se o usuário estiver logado
 function obterCabecalhoAutenticacao() {
@@ -22,7 +52,7 @@ export const api = {
       const res = await fetch(`${API_BASE_URL}/animals?${params.toString()}`);
       if (!res.ok) throw new Error('Falha ao buscar animais do servidor');
       const data = await res.json();
-      return Array.isArray(data.data) ? data.data : [];
+      return normalizarLista(data.data);
     } catch {
       return [];
     }
@@ -36,7 +66,7 @@ export const api = {
     const res = await fetch(`${API_BASE_URL}/animals/${id}`);
     if (!res.ok) throw new Error('Animal não encontrado');
     const data = await res.json();
-    return data.data;
+    return normalizarItem(data.data);
   },
 
   async buscarAnimal(id) {
@@ -54,7 +84,7 @@ export const api = {
       throw new Error(err.message || err.mensagem || 'Erro ao cadastrar animal');
     }
     const data = await res.json();
-    return data.data;
+    return normalizarItem(data.data);
   },
 
   async cadastrarAnimal(formData) {
@@ -72,7 +102,7 @@ export const api = {
       throw new Error(err.message || err.mensagem || 'Erro ao atualizar animal');
     }
     const data = await res.json();
-    return data.data;
+    return normalizarItem(data.data);
   },
 
   async atualizarAnimal(id, formData) {
@@ -89,7 +119,7 @@ export const api = {
       throw new Error(err.message || err.mensagem || 'Erro ao marcar animal como adotado');
     }
     const data = await res.json();
-    return data.data;
+    return normalizarItem(data.data);
   },
 
   async marcarComoAdotado(id) {
@@ -106,7 +136,7 @@ export const api = {
       throw new Error(err.message || err.mensagem || 'Erro ao marcar animal como disponível');
     }
     const data = await res.json();
-    return data.data;
+    return normalizarItem(data.data);
   },
 
   async marcarComoDisponivel(id) {
@@ -136,7 +166,7 @@ export const api = {
       const res = await fetch(`${API_BASE_URL}/events${all ? '?all=true' : ''}`);
       if (!res.ok) throw new Error('Falha ao buscar eventos');
       const data = await res.json();
-      return Array.isArray(data.data) ? data.data : [];
+      return normalizarLista(data.data);
     } catch {
       return [];
     }
@@ -157,7 +187,7 @@ export const api = {
       throw new Error(err.message || err.mensagem || 'Erro ao criar evento');
     }
     const data = await res.json();
-    return data.data;
+    return normalizarItem(data.data);
   },
 
   async cadastrarEvento(formData) {
@@ -175,7 +205,7 @@ export const api = {
       throw new Error(err.message || err.mensagem || 'Erro ao atualizar evento');
     }
     const data = await res.json();
-    return data.data;
+    return normalizarItem(data.data);
   },
 
   async atualizarEvento(id, formData) {
@@ -192,7 +222,7 @@ export const api = {
       throw new Error(err.message || err.mensagem || 'Erro ao alterar visibilidade');
     }
     const data = await res.json();
-    return data.data;
+    return normalizarItem(data.data);
   },
 
   async alternarVisibilidadeEvento(id) {
