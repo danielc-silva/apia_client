@@ -1,0 +1,151 @@
+:root {
+  --apia-dark: #1E4633;
+  --apia-darker: #163526;
+  --apia-light: #EBF2EC;
+  --apia-bg: #F9FBF9;
+  --apia-orange: #F46049;
+  --apia-orange-hover: #E04F38;
+  --apia-text: #2D3748;
+  --apia-muted: #64748B;
+  --apia-border: #D1E0D7;
+}
+
+body {
+  margin: 0;
+  background-color: var(--apia-bg);
+  color: var(--apia-text);
+  font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Oxygen',
+    'Ubuntu', 'Cantarell', 'Fira Sans', 'Droid Sans', 'Helvetica Neue', sans-serif;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+/* Cores Institucionais da APIA para uso com React Bootstrap */
+.bg-apia-dark {
+  background-color: var(--apia-dark) !important;
+  color: #ffffff;
+}
+
+.bg-apia-light {
+  background-color: var(--apia-light) !important;
+}
+
+.bg-apia-bg {
+  background-color: var(--apia-bg) !important;
+}
+
+.text-apia-dark {
+  color: var(--apia-dark) !important;
+}
+
+.text-apia-orange {
+  color: var(--apia-orange) !important;
+}
+
+/* Botões personalizados da ONG APIA */
+.btn-apia-orange {
+  background-color: var(--apia-orange);
+  border-color: var(--apia-orange);
+  color: #ffffff;
+  font-weight: 600;
+}
+
+.btn-apia-orange:hover,
+.btn-apia-orange:focus,
+.btn-apia-orange:active {
+  background-color: var(--apia-orange-hover) !important;
+  border-color: var(--apia-orange-hover) !important;
+  color: #ffffff !important;
+}
+
+.btn-apia-dark {
+  background-color: var(--apia-dark);
+  border-color: var(--apia-dark);
+  color: #ffffff;
+  font-weight: 600;
+}
+
+.btn-apia-dark:hover,
+.btn-apia-dark:focus,
+.btn-apia-dark:active {
+  background-color: var(--apia-darker) !important;
+  border-color: var(--apia-darker) !important;
+  color: #ffffff !important;
+}
+
+.btn-outline-apia-light {
+  color: #ffffff;
+  border-color: rgba(255, 255, 255, 0.35);
+  background-color: rgba(255, 255, 255, 0.08);
+  font-weight: 600;
+}
+
+.btn-outline-apia-light:hover {
+  color: #ffffff;
+  background-color: rgba(255, 255, 255, 0.18);
+  border-color: rgba(255, 255, 255, 0.5);
+}
+
+/* Cards e elementos visuais limpos */
+.card-apia {
+  border: 1px solid #e2e8f0;
+  border-radius: 12px;
+  background-color: #ffffff;
+}
+
+.pet-photo-square {
+  aspect-ratio: 1 / 1;
+  width: 100%;
+  object-fit: cover;
+}
+
+.line-clamp-2 {
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+}
+
+/* Links da Navbar */
+.navbar-apia .nav-link {
+  color: #4a5568;
+  font-weight: 600;
+  font-size: 0.9rem;
+  padding: 0.5rem 0.85rem !important;
+  border-radius: 8px;
+}
+
+.navbar-apia .nav-link:hover {
+  color: var(--apia-dark);
+  background-color: #f1f5f9;
+}
+
+.navbar-apia .nav-link.active {
+  color: var(--apia-dark) !important;
+  background-color: var(--apia-light);
+}
+
+/* Tipografia limpa ao lado da Logo APIA */
+.apia-logo-title {
+  font-family: 'Montserrat', sans-serif;
+  font-weight: 800;
+  text-transform: uppercase;
+  color: #E32626;
+  line-height: 1;
+  letter-spacing: 0.02em;
+}
+
+.apia-logo-subtitle {
+  font-family: 'Roboto', 'Inter', sans-serif;
+  font-weight: 600;
+  color: #124E2E;
+  line-height: 1.15;
+}
+
+.apia-logo-location {
+  font-family: 'Montserrat', sans-serif;
+  font-weight: 600;
+  color: #EF4444;
+  letter-spacing: 0.04em;
+  line-height: 1.15;
+}
