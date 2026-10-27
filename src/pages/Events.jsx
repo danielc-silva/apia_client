@@ -228,7 +228,7 @@ export const Events = () => {
                 {/* Descrição completa da notícia */}
                 <div>
                   <h4 className="fw-bold text-dark mb-2" style={{ fontSize: '0.92rem' }}>
-                    Descrição da notícia / evento
+                    Descrição da notícia
                   </h4>
                   <p
                     className="text-secondary mb-0"

@@ -89,9 +89,7 @@ export const AdminDashboard = () => {
   const carregarAnimais = async () => {
     try {
       setCarregandoAnimais(true);
-      const dados = await api.buscarAnimais({
-        status: filtroAnimais === 'todos' ? undefined : filtroAnimais,
-      });
+      const dados = await api.buscarAnimais();
       setAnimais(dados);
       setErroAnimais('');
     } catch (erro) {
@@ -116,9 +114,6 @@ export const AdminDashboard = () => {
 
   useEffect(() => {
     carregarAnimais();
-  }, [filtroAnimais]);
-
-  useEffect(() => {
     carregarEventos();
   }, []);
 
@@ -331,6 +326,7 @@ export const AdminDashboard = () => {
   };
 
   const animaisFiltrados = animais.filter((a) => {
+    if (filtroAnimais !== 'todos' && a.status !== filtroAnimais) return false;
     if (!buscaAnimais) return true;
     const q = buscaAnimais.toLowerCase();
     return a.name.toLowerCase().includes(q) || a.breed?.toLowerCase().includes(q);
