@@ -803,7 +803,7 @@ export const AdminDashboard = () => {
                   onChange={(e) => setFormularioPet({ ...formularioPet, status: e.target.value })}
                 >
                   <option value="disponivel">Disponível para Adoção</option>
-                  <option value="adotado">Adotado (Final Feliz ❤️)</option>
+                  <option value="adotado">Adotado</option>
                 </Form.Select>
               </Col>
             </Row>

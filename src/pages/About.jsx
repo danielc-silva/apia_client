@@ -9,7 +9,7 @@ export const About = () => {
   return (
     <div className="d-flex flex-column">
       {/* 1. Banner Superior */}
-      <section className="bg-apia-dark text-white py-5">
+      <section className="bg-apia-dark text-white py-5 apia-page-banner">
         <Container>
           <Row className="align-items-center g-4">
             <Col md={7}>
@@ -29,7 +29,7 @@ export const About = () => {
                 src={bannerSobreApia}
                 alt="Filhotes resgatados pela ONG APIA"
                 className="img-fluid rounded-4 shadow"
-                style={{ maxHeight: '240px', width: '100%', maxWidth: '380px', objectFit: 'cover' }}
+                style={{ height: '240px', maxHeight: '240px', width: '100%', maxWidth: '380px', objectFit: 'cover' }}
               />
             </Col>
           </Row>

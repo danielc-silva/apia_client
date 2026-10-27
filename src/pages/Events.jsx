@@ -1,5 +1,7 @@
 import { useEffect, useState } from 'react';
 import Container from 'react-bootstrap/Container';
+import Row from 'react-bootstrap/Row';
+import Col from 'react-bootstrap/Col';
 import Card from 'react-bootstrap/Card';
 import Spinner from 'react-bootstrap/Spinner';
 import Alert from 'react-bootstrap/Alert';
@@ -16,6 +18,7 @@ import {
   ArrowRight,
 } from 'lucide-react';
 import { api } from '../services/api.js';
+import bannerEventosApia from '../assets/banner-eventos-apia.png';
 
 export const Events = () => {
   const [eventos, setEventos] = useState([]);
@@ -74,18 +77,30 @@ export const Events = () => {
   return (
     <div className="d-flex flex-column">
       {/* 1. Banner */}
-      <section className="bg-apia-dark text-white py-5">
+      <section className="bg-apia-dark text-white py-5 apia-page-banner">
         <Container>
-          <span
-            className="badge rounded-pill px-3 py-2 mb-3 fw-medium"
-            style={{ backgroundColor: 'rgba(255,255,255,0.12)', color: '#a7f3d0' }}
-          >
-            Agenda e Comunicados
-          </span>
-          <h1 className="h2 fw-bold mb-2">Notícias e Eventos da APIA</h1>
-          <p className="text-light opacity-75 mb-0" style={{ maxWidth: '640px' }}>
-            Acompanhe nossas feirinhas de adoção, bazares beneficentes, campanhas de castração e ações voluntárias em Lagoa Vermelha.
-          </p>
+          <Row className="align-items-center g-4">
+            <Col md={7}>
+              <span
+                className="badge rounded-pill px-3 py-2 mb-3 fw-medium"
+                style={{ backgroundColor: 'rgba(255,255,255,0.12)', color: '#a7f3d0' }}
+              >
+                Agenda e Comunicados
+              </span>
+              <h1 className="h2 fw-bold mb-3">Notícias e Eventos da APIA</h1>
+              <p className="text-light opacity-75 mb-0">
+                Acompanhe nossas feirinhas de adoção, bazares beneficentes, campanhas de castração e ações voluntárias em Lagoa Vermelha.
+              </p>
+            </Col>
+            <Col md={5} className="text-center text-md-end">
+              <img
+                src={bannerEventosApia}
+                alt="Animais em eventos da ONG APIA"
+                className="img-fluid"
+                style={{ maxHeight: '240px', width: '100%', maxWidth: '380px', objectFit: 'contain' }}
+              />
+            </Col>
+          </Row>
         </Container>
       </section>
 

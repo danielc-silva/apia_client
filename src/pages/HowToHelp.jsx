@@ -91,27 +91,27 @@ export const HowToHelp = () => {
   return (
     <div className="d-flex flex-column">
       {/* 1. Banner Superior */}
-      <section className="bg-apia-dark text-white py-5">
+      <section className="bg-apia-dark text-white py-5 apia-page-banner">
         <Container>
           <Row className="align-items-center g-4">
-            <Col md={8}>
+            <Col md={7}>
               <span
                 className="badge rounded-pill px-3 py-2 mb-3 fw-medium"
                 style={{ backgroundColor: 'rgba(255,255,255,0.12)', color: '#a7f3d0' }}
               >
                 Solidariedade
               </span>
-              <h1 className="h2 fw-bold mb-2">Como Ajudar a APIA</h1>
+              <h1 className="h2 fw-bold mb-3">Como Ajudar a APIA</h1>
               <p className="text-light opacity-75 mb-0">
                 Existem várias formas de contribuir para que possamos continuar acolhendo, tratando e dando uma vida digna aos animais em Lagoa Vermelha e região.
               </p>
             </Col>
-            <Col md={4} className="d-none d-md-block text-end">
+            <Col md={5} className="text-center text-md-end">
               <img
                 src={bannerComoAjudarApia}
                 alt="Animais da ONG APIA - Como Ajudar"
-                className="rounded-4 shadow object-fit-cover"
-                style={{ width: '150px', height: '150px' }}
+                className="img-fluid rounded-4 shadow"
+                style={{ width: '200px', height: '200px', objectFit: 'cover' }}
               />
             </Col>
           </Row>

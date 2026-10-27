@@ -289,3 +289,9 @@ body {
 
 
 
+/* Altura padronizada para o banner verde das páginas internas */
+.apia-page-banner {
+  min-height: 336px;
+  display: flex;
+  align-items: center;
+}
