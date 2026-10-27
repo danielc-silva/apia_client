@@ -9,7 +9,6 @@ import {
   MapPin,
   AlertCircle,
   ZoomIn,
-  X,
   ArrowLeft,
   PawPrint,
   Building2,
@@ -117,28 +116,28 @@ export const Events = () => {
           ) : eventoSelecionado ? (
             /* VISÃO DE DETALHES DA NOTÍCIA / EVENTO */
             <div>
-              <Button
-                variant="outline-secondary"
-                size="sm"
+              <button
+                type="button"
                 onClick={() => setEventoSelecionado(null)}
-                className="mb-3 px-3 py-1 rounded-3 bg-white d-inline-flex align-items-center gap-2 fw-medium shadow-sm"
+                className="btn btn-sm btn-voltar-apia mb-3 px-3 py-1 rounded-3 d-inline-flex align-items-center gap-2 fw-medium shadow-sm"
                 style={{ fontSize: '0.82rem' }}
               >
                 <ArrowLeft size={15} />
                 Voltar
-              </Button>
+              </button>
 
               <Card className="border shadow-sm rounded-4 p-3 p-md-4 bg-white">
                 <div className="d-flex flex-column flex-md-row align-items-start gap-3 gap-md-4">
                   {/* Foto pequena no formato original para clicar e ampliar */}
                   {eventoSelecionado.photoUrl && (
                     <div
-                      className="p-2 border rounded-4 bg-white shadow-sm position-relative d-inline-flex align-items-center justify-content-center flex-shrink-0 mx-auto mx-md-0"
-                      style={{ cursor: 'pointer', maxWidth: '100%' }}
+                      className="event-thumb-wrapper p-2 shadow-sm position-relative d-inline-flex align-items-center justify-content-center flex-shrink-0 mx-auto mx-md-0 overflow-hidden"
+                      style={{ maxWidth: '100%' }}
                       onClick={() =>
                         setImagemAmpliada({
                           url: eventoSelecionado.photoUrl,
                           title: eventoSelecionado.title,
+                          date: eventoSelecionado.date,
                         })
                       }
                       title="Clique para ampliar a foto na tela"
@@ -146,26 +145,24 @@ export const Events = () => {
                       <img
                         src={eventoSelecionado.photoUrl}
                         alt={eventoSelecionado.title}
-                        className="rounded-3 d-block"
+                        className="rounded-3 d-block event-thumb-img"
                         style={{
                           width: 'auto',
                           height: 'auto',
-                          maxWidth: '210px',
-                          maxHeight: '210px',
+                          maxWidth: '220px',
+                          maxHeight: '220px',
                           objectFit: 'contain',
                         }}
                       />
                       <span
-                        className="position-absolute bottom-0 start-50 translate-middle-x mb-3 px-3 py-1 rounded-pill text-white d-inline-flex align-items-center gap-1 fw-semibold shadow"
+                        className="event-thumb-badge position-absolute bottom-0 start-50 translate-middle-x mb-3 px-3 py-1 rounded-pill text-white d-inline-flex align-items-center gap-1 fw-semibold shadow"
                         style={{
-                          backgroundColor: 'rgba(0, 0, 0, 0.78)',
-                          fontSize: '0.72rem',
                           pointerEvents: 'none',
                           whiteSpace: 'nowrap',
                         }}
                       >
                         <ZoomIn size={13} />
-                        Veja
+                        Ampliar
                       </span>
                     </div>
                   )}
@@ -213,7 +210,7 @@ export const Events = () => {
 
                 <hr className="my-3 text-secondary opacity-25" />
 
-                {/* Descrição completa da notícia / evento (fonte reduzida) */}
+                {/* Descrição completa da notícia */}
                 <div>
                   <h4 className="fw-bold text-dark mb-2" style={{ fontSize: '0.92rem' }}>
                     Descrição da notícia / evento
@@ -269,78 +266,71 @@ export const Events = () => {
                   }}
                   className="event-card-apia p-4"
                 >
-                  <div className="d-flex flex-column flex-sm-row align-items-start align-items-sm-center justify-content-between gap-4 ps-1">
-                    {/* Coluna Esquerda: Textos e Badges */}
-                    <div className="flex-grow-1">
-                      <div
-                        className="d-inline-flex align-items-center gap-1 fw-bold text-uppercase mb-1"
-                        style={{ fontSize: '0.72rem', color: 'var(--apia-dark)' }}
-                      >
-                        <Building2 size={13} />
-                        <span>ONG APIA</span>
-                      </div>
-
-                      <h3
-                        className="fw-bold text-uppercase mb-2 event-card-title"
-                        style={{ fontSize: '1.1rem' }}
-                      >
-                        {evento.title}
-                      </h3>
-
-                      <div className="d-flex flex-wrap align-items-center gap-2 mb-2">
-                        <span
-                          className="px-3 py-1 rounded-3 d-inline-flex align-items-center gap-1 fw-medium"
-                          style={{
-                            backgroundColor: 'var(--apia-light)',
-                            color: 'var(--apia-dark)',
-                            fontSize: '0.78rem',
-                          }}
-                        >
-                          <MapPin size={13} />
-                          Lagoa Vermelha - RS
-                        </span>
-
-                        <span
-                          className="px-3 py-1 rounded-3 border bg-white text-secondary d-inline-flex align-items-center gap-1"
-                          style={{ fontSize: '0.78rem' }}
-                        >
-                          <PawPrint size={13} />
-                          Notícia / Evento
-                        </span>
-                      </div>
-
-                      <p
-                        className="text-secondary mb-3 line-clamp-2"
-                        style={{ fontSize: '0.88rem' }}
-                      >
-                        {evento.description}
-                      </p>
-
-                      <div className="d-flex flex-wrap align-items-center justify-content-between gap-2">
+                  <div className="d-flex flex-column flex-sm-row align-items-stretch justify-content-between gap-3 ps-1">
+                    {/* Coluna Esquerda: Textos, Badges e Data */}
+                    <div className="flex-grow-1 d-flex flex-column justify-content-between">
+                      <div>
                         <div
-                          className="d-flex align-items-center gap-2 text-secondary fw-medium"
-                          style={{ fontSize: '0.8rem' }}
+                          className="d-inline-flex align-items-center gap-1 fw-bold text-uppercase mb-1"
+                          style={{ fontSize: '0.72rem', color: 'var(--apia-dark)' }}
                         >
-                          <Calendar size={14} />
-                          <span>
-                            {evento.date
-                              ? `Data: ${formatarDataCurta(evento.date)}`
-                              : 'Data a confirmar'}
+                          <Building2 size={13} />
+                          <span>ONG APIA</span>
+                        </div>
+
+                        <h3
+                          className="fw-bold text-uppercase mb-2 event-card-title"
+                          style={{ fontSize: '1.1rem' }}
+                        >
+                          {evento.title}
+                        </h3>
+
+                        <div className="d-flex flex-wrap align-items-center gap-2 mb-2">
+                          <span
+                            className="px-3 py-1 rounded-3 d-inline-flex align-items-center gap-1 fw-medium"
+                            style={{
+                              backgroundColor: 'var(--apia-light)',
+                              color: 'var(--apia-dark)',
+                              fontSize: '0.78rem',
+                            }}
+                          >
+                            <MapPin size={13} />
+                            Lagoa Vermelha - RS
+                          </span>
+
+                          <span
+                            className="px-3 py-1 rounded-3 border bg-white text-secondary d-inline-flex align-items-center gap-1"
+                            style={{ fontSize: '0.78rem' }}
+                          >
+                            <PawPrint size={13} />
+                            Notícia / Evento
                           </span>
                         </div>
 
-                        <span
-                          className="d-inline-flex align-items-center gap-1 fw-semibold event-card-cta"
-                          style={{ fontSize: '0.78rem' }}
+                        <p
+                          className="text-secondary mb-3 line-clamp-2"
+                          style={{ fontSize: '0.88rem' }}
                         >
-                          Ver detalhes <ArrowRight size={14} />
+                          {evento.description}
+                        </p>
+                      </div>
+
+                      <div
+                        className="d-flex align-items-center gap-2 text-secondary fw-medium"
+                        style={{ fontSize: '0.8rem' }}
+                      >
+                        <Calendar size={14} />
+                        <span>
+                          {evento.date
+                            ? `Data: ${formatarDataCurta(evento.date)}`
+                            : 'Data a confirmar'}
                         </span>
                       </div>
                     </div>
 
-                    {/* Coluna Direita: Miniatura no formato original */}
-                    {evento.photoUrl && (
-                      <div className="flex-shrink-0 align-self-center">
+                    {/* Coluna Direita: Imagem acima e "Ver detalhes ->" exatamente na direita e embaixo da imagem */}
+                    <div className="d-flex flex-column align-items-end justify-content-between flex-shrink-0 gap-2">
+                      {evento.photoUrl ? (
                         <img
                           src={evento.photoUrl}
                           alt={evento.title}
@@ -354,8 +344,17 @@ export const Events = () => {
                           }}
                           loading="lazy"
                         />
-                      </div>
-                    )}
+                      ) : (
+                        <div />
+                      )}
+
+                      <span
+                        className="d-inline-flex align-items-center gap-1 fw-semibold event-card-cta mt-auto"
+                        style={{ fontSize: '0.78rem', whiteSpace: 'nowrap' }}
+                      >
+                        Ver detalhes <ArrowRight size={14} />
+                      </span>
+                    </div>
                   </div>
                 </div>
               ))}
@@ -364,47 +363,17 @@ export const Events = () => {
         </Container>
       </section>
 
-      {/* Lightbox em Tela Ampliada para Visualizar a Foto Grande */}
+      {/* Lightbox em Tela Ampliada: Exibe apenas a imagem */}
       {imagemAmpliada && (
         <div
-          className="position-fixed top-0 start-0 w-100 h-100 d-flex flex-column align-items-center justify-content-center p-3 p-md-4"
-          style={{
-            backgroundColor: 'rgba(0, 0, 0, 0.88)',
-            zIndex: 2050,
-            cursor: 'zoom-out',
-          }}
+          className="apia-lightbox-backdrop d-flex align-items-center justify-content-center p-3 p-md-4"
           onClick={() => setImagemAmpliada(null)}
         >
-          <div
-            className="d-flex align-items-center justify-content-between text-white mb-3 w-100"
-            style={{ maxWidth: '960px' }}
-            onClick={(e) => e.stopPropagation()}
-          >
-            <h6 className="fw-bold mb-0 text-truncate pe-3">{imagemAmpliada.title}</h6>
-            <Button
-              variant="light"
-              size="sm"
-              className="rounded-pill d-inline-flex align-items-center gap-1 fw-semibold px-3 py-1 flex-shrink-0"
-              onClick={() => setImagemAmpliada(null)}
-            >
-              <X size={16} />
-              Fechar
-            </Button>
-          </div>
-
           <img
             src={imagemAmpliada.url}
             alt={imagemAmpliada.title}
-            className="rounded-3 shadow-lg"
-            onClick={(e) => e.stopPropagation()}
-            style={{
-              maxWidth: '92vw',
-              maxHeight: '84vh',
-              width: 'auto',
-              height: 'auto',
-              objectFit: 'contain',
-              cursor: 'default',
-            }}
+            className="apia-lightbox-only-img"
+            onClick={() => setImagemAmpliada(null)}
           />
         </div>
       )}

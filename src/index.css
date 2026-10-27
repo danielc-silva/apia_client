@@ -191,3 +191,101 @@ body {
   transform: translateX(3px);
 }
 
+.btn-voltar-apia {
+  background-color: #ffffff;
+  color: var(--apia-dark);
+  border: 1px solid #cbd5e1;
+  transition: background-color 0.2s ease, color 0.2s ease, border-color 0.2s ease;
+}
+
+.btn-voltar-apia:hover,
+.btn-voltar-apia:focus,
+.btn-voltar-apia:active {
+  background-color: var(--apia-dark) !important;
+  border-color: var(--apia-dark) !important;
+  color: #ffffff !important;
+}
+
+/* Miniatura da imagem da notícia com efeito de hover suave */
+.event-thumb-wrapper {
+  cursor: pointer;
+  border: 1px solid #e2e8f0;
+  border-radius: 16px;
+  background-color: #f8fafc;
+  transition: transform 0.22s ease, box-shadow 0.22s ease, border-color 0.22s ease;
+}
+
+.event-thumb-wrapper:hover {
+  transform: translateY(-2px);
+  border-color: var(--apia-dark);
+  box-shadow: 0 10px 24px rgba(30, 70, 51, 0.14) !important;
+}
+
+.event-thumb-wrapper .event-thumb-img {
+  transition: transform 0.25s ease;
+}
+
+.event-thumb-wrapper:hover .event-thumb-img {
+  transform: scale(1.03);
+}
+
+.event-thumb-badge {
+  background-color: rgba(30, 70, 51, 0.88);
+  backdrop-filter: blur(4px);
+  font-size: 0.72rem;
+  letter-spacing: 0.01em;
+  transition: background-color 0.2s ease, transform 0.2s ease;
+}
+
+.event-thumb-wrapper:hover .event-thumb-badge {
+  background-color: var(--apia-orange);
+  transform: translateX(-50%) scale(1.04) !important;
+}
+
+/* Lightbox elegante para ampliação da imagem da notícia (apenas a imagem) */
+@keyframes apiaLightboxFadeIn {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+@keyframes apiaLightboxZoomIn {
+  from {
+    opacity: 0;
+    transform: scale(0.95);
+  }
+  to {
+    opacity: 1;
+    transform: scale(1);
+  }
+}
+
+.apia-lightbox-backdrop {
+  position: fixed;
+  inset: 0;
+  z-index: 2050;
+  background-color: rgba(10, 18, 14, 0.85);
+  backdrop-filter: blur(8px);
+  -webkit-backdrop-filter: blur(8px);
+  cursor: zoom-out;
+  animation: apiaLightboxFadeIn 0.2s ease-out;
+}
+
+.apia-lightbox-only-img {
+  max-width: 92vw;
+  max-height: 90vh;
+  width: auto;
+  height: auto;
+  object-fit: contain;
+  border-radius: 14px;
+  box-shadow: 0 24px 60px rgba(0, 0, 0, 0.55);
+  cursor: zoom-out;
+  animation: apiaLightboxZoomIn 0.22s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+
+
+
