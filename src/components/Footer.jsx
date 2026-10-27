@@ -1,6 +1,5 @@
 import { Link } from 'react-router-dom';
 import Container from 'react-bootstrap/Container';
-import Row from 'react-bootstrap/Col';
 import Col from 'react-bootstrap/Col';
 import { Instagram, Facebook, Phone, MapPin, Mail } from 'lucide-react';
 import logoApia from '../assets/logo-apia.png';

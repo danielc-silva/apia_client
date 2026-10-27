@@ -37,9 +37,11 @@ export const AdminDashboard = () => {
   const [filtroAnimais, setFiltroAnimais] = useState('todos');
   const [buscaAnimais, setBuscaAnimais] = useState('');
   const [carregandoAnimais, setCarregandoAnimais] = useState(false);
+  const [erroAnimais, setErroAnimais] = useState('');
 
   const [eventos, setEventos] = useState([]);
   const [carregandoEventos, setCarregandoEventos] = useState(false);
+  const [erroEventos, setErroEventos] = useState('');
 
   const [notificacao, setNotificacao] = useState(null);
 
@@ -91,8 +93,9 @@ export const AdminDashboard = () => {
         status: filtroAnimais === 'todos' ? undefined : filtroAnimais,
       });
       setAnimais(dados);
+      setErroAnimais('');
     } catch (erro) {
-      console.error(erro);
+      setErroAnimais(erro.message || 'Não foi possível carregar os animais.');
     } finally {
       setCarregandoAnimais(false);
     }
@@ -103,8 +106,9 @@ export const AdminDashboard = () => {
       setCarregandoEventos(true);
       const dados = await api.buscarEventos(true);
       setEventos(dados);
+      setErroEventos('');
     } catch (erro) {
-      console.error(erro);
+      setErroEventos(erro.message || 'Não foi possível carregar os eventos.');
     } finally {
       setCarregandoEventos(false);
     }
@@ -492,6 +496,13 @@ export const AdminDashboard = () => {
           <Card className="border-0 shadow-sm rounded-4 overflow-hidden">
             {carregandoAnimais ? (
               <div className="p-5 text-center small text-muted">Carregando lista de patudos...</div>
+            ) : erroAnimais ? (
+              <Alert variant="danger" className="m-3">
+                <p className="mb-3">Não foi possível carregar os animais: {erroAnimais}</p>
+                <Button variant="outline-danger" size="sm" onClick={carregarAnimais}>
+                  Tentar novamente
+                </Button>
+              </Alert>
             ) : animaisFiltrados.length === 0 ? (
               <div className="p-5 text-center text-muted">
                 <PawPrint size={32} className="mb-2 opacity-50" />
@@ -585,6 +596,13 @@ export const AdminDashboard = () => {
           <Card className="border-0 shadow-sm rounded-4 overflow-hidden">
             {carregandoEventos ? (
               <div className="p-5 text-center small text-muted">Carregando eventos...</div>
+            ) : erroEventos ? (
+              <Alert variant="danger" className="m-3">
+                <p className="mb-3">Não foi possível carregar os eventos: {erroEventos}</p>
+                <Button variant="outline-danger" size="sm" onClick={carregarEventos}>
+                  Tentar novamente
+                </Button>
+              </Alert>
             ) : eventos.length === 0 ? (
               <div className="p-5 text-center text-muted">
                 <Calendar size={32} className="mb-2 opacity-50" />

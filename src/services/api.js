@@ -1,5 +1,28 @@
 const API_BASE_URL = '/api';
 
+async function buscarLista(url, mensagemErro, headers) {
+  let res;
+  try {
+    res = await fetch(url, { headers });
+  } catch (erro) {
+    throw new Error(`${mensagemErro}: ${erro.message}`, { cause: erro });
+  }
+
+  if (!res.ok) {
+    const tipoConteudo = res.headers.get('content-type') || '';
+    const erro = tipoConteudo.includes('application/json') ? await res.json() : null;
+    throw new Error(
+      erro?.message || erro?.mensagem || `${mensagemErro} (HTTP ${res.status})`
+    );
+  }
+
+  const resposta = await res.json();
+  if (!Array.isArray(resposta.data)) {
+    throw new Error(`${mensagemErro}: formato de resposta inválido.`);
+  }
+  return resposta.data;
+}
+
 // Retorna os headers de autorização com o token JWT se o usuário estiver logado
 function obterCabecalhoAutenticacao() {
   const token = localStorage.getItem('ong_apia_token');
@@ -11,21 +34,17 @@ export const api = {
   // MÉTODOS DE ANIMAIS
   // ==========================================
   async getAnimals(filters) {
-    try {
-      const params = new URLSearchParams();
-      if (filters) {
-        Object.entries(filters).forEach(([k, v]) => {
-          if (v && v !== 'todos') params.append(k, v);
-        });
-      }
-
-      const res = await fetch(`${API_BASE_URL}/animals?${params.toString()}`);
-      if (!res.ok) throw new Error('Falha ao buscar animais do servidor');
-      const data = await res.json();
-      return Array.isArray(data.data) ? data.data : [];
-    } catch {
-      return [];
+    const params = new URLSearchParams();
+    if (filters) {
+      Object.entries(filters).forEach(([k, v]) => {
+        if (v && v !== 'todos') params.append(k, v);
+      });
     }
+
+    return buscarLista(
+      `${API_BASE_URL}/animals?${params.toString()}`,
+      'Falha ao buscar animais'
+    );
   },
 
   async buscarAnimais(filtros) {
@@ -132,14 +151,9 @@ export const api = {
   // MÉTODOS DE EVENTOS E NOTÍCIAS
   // ==========================================
   async getEvents(all = false) {
-    try {
-      const res = await fetch(`${API_BASE_URL}/events${all ? '?all=true' : ''}`);
-      if (!res.ok) throw new Error('Falha ao buscar eventos');
-      const data = await res.json();
-      return Array.isArray(data.data) ? data.data : [];
-    } catch {
-      return [];
-    }
+    const url = all ? `${API_BASE_URL}/events/admin` : `${API_BASE_URL}/events`;
+    const headers = all ? obterCabecalhoAutenticacao() : undefined;
+    return buscarLista(url, 'Falha ao buscar eventos', headers);
   },
 
   async buscarEventos(todos = false) {

@@ -5,6 +5,8 @@ import Row from 'react-bootstrap/Row';
 import Col from 'react-bootstrap/Col';
 import Card from 'react-bootstrap/Card';
 import Spinner from 'react-bootstrap/Spinner';
+import Alert from 'react-bootstrap/Alert';
+import Button from 'react-bootstrap/Button';
 import { Heart, Home as HomeIcon, BookOpen, ArrowRight, PawPrint, GraduationCap } from 'lucide-react';
 import { api } from '../services/api.js';
 import bannerInicioApia from '../assets/banner-inicio-apia.png';
@@ -17,26 +19,29 @@ export const Home = () => {
   const [animaisDisponiveis, setAnimaisDisponiveis] = useState([]);
   const [animaisAdotados, setAnimaisAdotados] = useState([]);
   const [carregando, setCarregando] = useState(true);
+  const [erroCarregamento, setErroCarregamento] = useState('');
 
   const [petSelecionadoAdocao, setPetSelecionadoAdocao] = useState(null);
   const [petSelecionadoCompartilhar, setPetSelecionadoCompartilhar] = useState(null);
 
-  useEffect(() => {
-    async function carregarDados() {
-      try {
-        setCarregando(true);
-        const [disponiveis, adotados] = await Promise.all([
-          api.buscarAnimais({ status: 'disponivel' }),
-          api.buscarAnimais({ status: 'adotado' }),
-        ]);
-        setAnimaisDisponiveis(disponiveis.slice(0, 4));
-        setAnimaisAdotados(adotados);
-      } catch (erro) {
-        console.error('Erro ao carregar dados da página inicial:', erro);
-      } finally {
-        setCarregando(false);
-      }
+  const carregarDados = async () => {
+    try {
+      setCarregando(true);
+      setErroCarregamento('');
+      const [disponiveis, adotados] = await Promise.all([
+        api.buscarAnimais({ status: 'disponivel' }),
+        api.buscarAnimais({ status: 'adotado' }),
+      ]);
+      setAnimaisDisponiveis(disponiveis.slice(0, 4));
+      setAnimaisAdotados(adotados);
+    } catch (erro) {
+      setErroCarregamento(erro.message || 'Não foi possível carregar os animais.');
+    } finally {
+      setCarregando(false);
     }
+  };
+
+  useEffect(() => {
     carregarDados();
   }, []);
 
@@ -186,6 +191,13 @@ export const Home = () => {
             <div className="text-center py-5">
               <Spinner animation="border" variant="success" />
             </div>
+          ) : erroCarregamento ? (
+            <Alert variant="danger" className="text-center">
+              <p className="mb-3">Não foi possível carregar os animais: {erroCarregamento}</p>
+              <Button variant="outline-danger" size="sm" onClick={carregarDados}>
+                Tentar novamente
+              </Button>
+            </Alert>
           ) : animaisDisponiveis.length === 0 ? (
             <Card className="border-0 shadow-sm rounded-4 p-5 text-center mx-auto" style={{ maxWidth: '480px' }}>
               <Card.Body>

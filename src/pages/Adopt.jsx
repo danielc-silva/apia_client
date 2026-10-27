@@ -3,6 +3,7 @@ import Container from 'react-bootstrap/Container';
 import Row from 'react-bootstrap/Row';
 import Col from 'react-bootstrap/Col';
 import Card from 'react-bootstrap/Card';
+import Alert from 'react-bootstrap/Alert';
 import Form from 'react-bootstrap/Form';
 import Button from 'react-bootstrap/Button';
 import Spinner from 'react-bootstrap/Spinner';
@@ -18,6 +19,7 @@ export const Adopt = () => {
   const [animais, setAnimais] = useState([]);
   const [finaisFelizes, setFinaisFelizes] = useState([]);
   const [carregando, setCarregando] = useState(true);
+  const [erroCarregamento, setErroCarregamento] = useState('');
 
   const [especie, setEspecie] = useState('todos');
   const [porte, setPorte] = useState('todos');
@@ -30,6 +32,7 @@ export const Adopt = () => {
   const buscarAnimaisFiltro = async (filtrosPersonalizados) => {
     try {
       setCarregando(true);
+      setErroCarregamento('');
       const criterio = filtrosPersonalizados || {
         species: especie,
         size: porte,
@@ -44,7 +47,7 @@ export const Adopt = () => {
       setAnimais(disponiveis);
       setFinaisFelizes(adotados);
     } catch (erro) {
-      console.error('Erro ao filtrar pets:', erro);
+      setErroCarregamento(erro.message || 'Não foi possível carregar os animais.');
     } finally {
       setCarregando(false);
     }
@@ -192,6 +195,13 @@ export const Adopt = () => {
             <div className="text-center py-5">
               <Spinner animation="border" variant="success" />
             </div>
+          ) : erroCarregamento ? (
+            <Alert variant="danger" className="text-center">
+              <p className="mb-3">Não foi possível carregar os animais: {erroCarregamento}</p>
+              <Button variant="outline-danger" size="sm" onClick={() => buscarAnimaisFiltro()}>
+                Tentar novamente
+              </Button>
+            </Alert>
           ) : animais.length === 0 ? (
             <Card className="border-0 shadow-sm rounded-4 p-5 text-center mx-auto" style={{ maxWidth: '480px' }}>
               <Card.Body>

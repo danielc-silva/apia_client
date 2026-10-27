@@ -5,25 +5,30 @@ import Col from 'react-bootstrap/Col';
 import Card from 'react-bootstrap/Card';
 import Badge from 'react-bootstrap/Badge';
 import Spinner from 'react-bootstrap/Spinner';
+import Alert from 'react-bootstrap/Alert';
+import Button from 'react-bootstrap/Button';
 import { Calendar, MapPin, AlertCircle } from 'lucide-react';
 import { api } from '../services/api.js';
 
 export const Events = () => {
   const [eventos, setEventos] = useState([]);
   const [carregando, setCarregando] = useState(true);
+  const [erroCarregamento, setErroCarregamento] = useState('');
+
+  const carregarEventos = async () => {
+    try {
+      setCarregando(true);
+      setErroCarregamento('');
+      const dados = await api.buscarEventos(false);
+      setEventos(dados);
+    } catch (erro) {
+      setErroCarregamento(erro.message || 'Não foi possível carregar os eventos.');
+    } finally {
+      setCarregando(false);
+    }
+  };
 
   useEffect(() => {
-    async function carregarEventos() {
-      try {
-        setCarregando(true);
-        const dados = await api.buscarEventos(false);
-        setEventos(dados);
-      } catch (erro) {
-        console.error('Erro ao buscar eventos:', erro);
-      } finally {
-        setCarregando(false);
-      }
-    }
     carregarEventos();
   }, []);
 
@@ -66,6 +71,13 @@ export const Events = () => {
             <div className="text-center py-5">
               <Spinner animation="border" variant="success" />
             </div>
+          ) : erroCarregamento ? (
+            <Alert variant="danger" className="mx-auto text-center" style={{ maxWidth: '560px' }}>
+              <p className="mb-3">Não foi possível carregar os eventos: {erroCarregamento}</p>
+              <Button variant="outline-danger" size="sm" onClick={carregarEventos}>
+                Tentar novamente
+              </Button>
+            </Alert>
           ) : eventos.length === 0 ? (
             <Card className="border-0 shadow-sm rounded-4 p-5 text-center mx-auto" style={{ maxWidth: '460px' }}>
               <Card.Body>
