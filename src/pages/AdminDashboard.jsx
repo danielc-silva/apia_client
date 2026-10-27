@@ -496,7 +496,7 @@ export const AdminDashboard = () => {
 
           <Card className="border-0 shadow-sm rounded-4 overflow-hidden">
             {carregandoAnimais ? (
-              <div className="p-5 text-center small text-muted">Carregando lista de animaiss...</div>
+              <div className="p-5 text-center text-muted fw-semibold">Carregando animais...</div>
             ) : erroAnimais ? (
               <Alert variant="danger" className="m-3">
                 <p className="mb-3">Não foi possível carregar os animais: {erroAnimais}</p>
@@ -604,7 +604,7 @@ export const AdminDashboard = () => {
 
           <Card className="border-0 shadow-sm rounded-4 overflow-hidden">
             {carregandoEventos ? (
-              <div className="p-5 text-center small text-muted">Carregando eventos...</div>
+              <div className="p-5 text-center text-muted fw-semibold">Carregando notícias...</div>
             ) : erroEventos ? (
               <Alert variant="danger" className="m-3">
                 <p className="mb-3">Não foi possível carregar os eventos: {erroEventos}</p>

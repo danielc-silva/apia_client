@@ -6,7 +6,6 @@ import Card from 'react-bootstrap/Card';
 import Alert from 'react-bootstrap/Alert';
 import Form from 'react-bootstrap/Form';
 import Button from 'react-bootstrap/Button';
-import Spinner from 'react-bootstrap/Spinner';
 import { Search, RotateCcw, PawPrint } from 'lucide-react';
 import { api } from '../services/api.js';
 import bannerQueroAdotarApia from '../assets/banner-quero-adotar-apia.png';
@@ -209,8 +208,8 @@ export const Adopt = () => {
           </div>
 
           {carregando ? (
-            <div className="text-center py-5">
-              <Spinner animation="border" variant="success" />
+            <div className="text-center py-5 text-muted fw-semibold">
+              Carregando animais...
             </div>
           ) : erroCarregamento ? (
             <Alert variant="danger" className="text-center">

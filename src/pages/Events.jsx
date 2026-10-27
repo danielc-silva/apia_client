@@ -3,7 +3,6 @@ import Container from 'react-bootstrap/Container';
 import Row from 'react-bootstrap/Row';
 import Col from 'react-bootstrap/Col';
 import Card from 'react-bootstrap/Card';
-import Spinner from 'react-bootstrap/Spinner';
 import Alert from 'react-bootstrap/Alert';
 import Button from 'react-bootstrap/Button';
 import {
@@ -120,8 +119,8 @@ export const Events = () => {
       <section className="py-5 flex-grow-1">
         <Container style={{ maxWidth: '940px' }}>
           {carregando ? (
-            <div className="text-center py-5">
-              <Spinner animation="border" variant="success" />
+            <div className="text-center py-5 text-muted fw-semibold">
+              Carregando notícias...
             </div>
           ) : erroCarregamento ? (
             <Alert variant="danger" className="mx-auto text-center" style={{ maxWidth: '560px' }}>
