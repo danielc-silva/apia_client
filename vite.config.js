@@ -1,29 +1,31 @@
 import { defineConfig } from 'vite';
 import react from '@vitejs/plugin-react';
 
+const BACKEND_TARGET = 'https://webservices-ongapia.onrender.com';
+
 export default defineConfig({
   plugins: [react()],
   server: {
     port: 5173,
     proxy: {
       '/api': {
-        target: 'http://localhost:3001',
+        target: BACKEND_TARGET,
         changeOrigin: true,
       },
       '/uploads': {
-        target: 'http://localhost:3001',
+        target: BACKEND_TARGET,
         changeOrigin: true,
       },
       '/animais': {
-        target: 'http://localhost:3001',
+        target: BACKEND_TARGET,
         changeOrigin: true,
       },
       '/eventos': {
-        target: 'http://localhost:3001',
+        target: BACKEND_TARGET,
         changeOrigin: true,
       },
       '/auth': {
-        target: 'http://localhost:3001',
+        target: BACKEND_TARGET,
         changeOrigin: true,
       },
     },
