@@ -30,6 +30,7 @@ import {
 import { api } from '../services/api.js';
 import { ImageCropperModal } from '../components/ImageCropperModal.jsx';
 import { SharePetModal } from '../components/SharePetModal.jsx';
+import { ShareEventModal } from '../components/ShareEventModal.jsx';
 
 export const AdminDashboard = () => {
   const navigate = useNavigate();
@@ -47,6 +48,7 @@ export const AdminDashboard = () => {
 
   const [notificacao, setNotificacao] = useState(null);
   const [petCompartilhar, setPetCompartilhar] = useState(null);
+  const [eventoCompartilhar, setEventoCompartilhar] = useState(null);
 
   const [modalPetAberto, setModalPetAberto] = useState(false);
   const [idPetEdicao, setIdPetEdicao] = useState(null);
@@ -651,6 +653,15 @@ export const AdminDashboard = () => {
                       </Button>
 
                       <Button
+                        variant="outline-secondary"
+                        size="sm"
+                        onClick={() => setEventoCompartilhar(ev)}
+                        title="Compartilhar / Gerar arte para Instagram"
+                      >
+                        <Share2 size={15} />
+                      </Button>
+
+                      <Button
                         variant="outline-primary"
                         size="sm"
                         onClick={() => abrirModalEvento(ev)}
@@ -1022,6 +1033,13 @@ export const AdminDashboard = () => {
         pet={petCompartilhar}
         isOpen={!!petCompartilhar}
         onClose={() => setPetCompartilhar(null)}
+      />
+
+      {/* MODAL DE COMPARTILHAMENTO DO EVENTO / NOTÍCIA */}
+      <ShareEventModal
+        event={eventoCompartilhar}
+        isOpen={!!eventoCompartilhar}
+        onClose={() => setEventoCompartilhar(null)}
       />
     </Container>
   );

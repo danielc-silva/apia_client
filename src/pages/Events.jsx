@@ -16,15 +16,18 @@ import {
   Building2,
   MessageCircle,
   ArrowRight,
+  Share2,
 } from 'lucide-react';
 import { api } from '../services/api.js';
 import bannerEventosApia from '../assets/banner-eventos-apia.png';
+import { ShareEventModal } from '../components/ShareEventModal.jsx';
 
 export const Events = () => {
   const [eventos, setEventos] = useState([]);
   const [carregando, setCarregando] = useState(true);
   const [erroCarregamento, setErroCarregamento] = useState('');
   const [eventoSelecionado, setEventoSelecionado] = useState(null);
+  const [eventoCompartilhar, setEventoCompartilhar] = useState(null);
   const [imagemAmpliada, setImagemAmpliada] = useState(null);
 
   const carregarEventos = async () => {
@@ -33,6 +36,15 @@ export const Events = () => {
       setErroCarregamento('');
       const dados = await api.buscarEventos(false);
       setEventos(dados);
+
+      const params = new URLSearchParams(window.location.search);
+      const idEventoUrl = params.get('evento');
+      if (idEventoUrl) {
+        const encontrado = dados.find((ev) => String(ev.id) === String(idEventoUrl));
+        if (encontrado) {
+          setEventoSelecionado(encontrado);
+        }
+      }
     } catch (erro) {
       setErroCarregamento(erro.message || 'Não foi possível carregar os eventos.');
     } finally {
@@ -131,15 +143,27 @@ export const Events = () => {
           ) : eventoSelecionado ? (
             /* VISÃO DE DETALHES DA NOTÍCIA / EVENTO */
             <div>
-              <button
-                type="button"
-                onClick={() => setEventoSelecionado(null)}
-                className="btn btn-sm btn-voltar-apia mb-3 px-3 py-1 rounded-3 d-inline-flex align-items-center gap-2 fw-medium shadow-sm"
-                style={{ fontSize: '0.82rem' }}
-              >
-                <ArrowLeft size={15} />
-                Voltar
-              </button>
+              <div className="d-flex align-items-center justify-content-between gap-2 mb-3">
+                <button
+                  type="button"
+                  onClick={() => setEventoSelecionado(null)}
+                  className="btn btn-sm btn-voltar-apia px-3 py-1 rounded-3 d-inline-flex align-items-center gap-2 fw-medium shadow-sm"
+                  style={{ fontSize: '0.82rem' }}
+                >
+                  <ArrowLeft size={15} />
+                  Voltar
+                </button>
+
+                <Button
+                  size="sm"
+                  onClick={() => setEventoCompartilhar(eventoSelecionado)}
+                  className="btn-apia-orange px-3 py-1 rounded-3 d-inline-flex align-items-center gap-2 fw-semibold shadow-sm"
+                  style={{ fontSize: '0.82rem' }}
+                >
+                  <Share2 size={15} />
+                  Compartilhar
+                </Button>
+              </div>
 
               <Card className="border shadow-sm rounded-4 p-3 p-md-4 bg-white">
                 <div className="d-flex flex-column flex-md-row align-items-start gap-3 gap-md-4">
@@ -182,7 +206,7 @@ export const Events = () => {
                     </div>
                   )}
 
-                  {/* Cabeçalho de informações ao lado da foto (fonte reduzida) */}
+                  {/* Cabeçalho de informações ao lado da foto */}
                   <div className="flex-grow-1">
                     <span
                       className="d-inline-block border rounded-2 px-2 py-1 mb-2 fw-semibold text-uppercase text-apia-dark"
@@ -242,7 +266,7 @@ export const Events = () => {
                   </p>
                 </div>
 
-                {/* Bloco de contato no rodapé */}
+                {/* Bloco de contato e compartilhamento no rodapé */}
                 <div
                   className="rounded-3 p-3 mt-3"
                   style={{
@@ -254,18 +278,20 @@ export const Events = () => {
                     Quer saber mais ou participar?
                   </h5>
                   <p className="text-secondary mb-2" style={{ fontSize: '0.78rem' }}>
-                    Entre em contato através do canal oficial da ONG APIA:
+                    Entre em contato através do canal oficial da ONG APIA ou compartilhe esta notícia:
                   </p>
-                  <a
-                    href="https://wa.me/5554996546910"
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    className="btn bg-white border rounded-3 px-3 py-1 d-inline-flex align-items-center gap-2 fw-semibold text-apia-dark shadow-sm"
-                    style={{ fontSize: '0.8rem' }}
-                  >
-                    <MessageCircle size={15} className="text-success" />
-                    (54) 99654-6910
-                  </a>
+                  <div className="d-flex flex-wrap align-items-center gap-2">
+                    <a
+                      href="https://wa.me/5554996546910"
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="btn bg-white border rounded-3 px-3 py-1 d-inline-flex align-items-center gap-2 fw-semibold text-apia-dark shadow-sm"
+                      style={{ fontSize: '0.8rem' }}
+                    >
+                      <MessageCircle size={15} className="text-success" />
+                      (54) 99654-6910
+                    </a>
+                  </div>
                 </div>
               </Card>
             </div>
@@ -392,6 +418,13 @@ export const Events = () => {
           />
         </div>
       )}
+
+      {/* Modal de Compartilhamento da Notícia / Evento */}
+      <ShareEventModal
+        event={eventoCompartilhar}
+        isOpen={!!eventoCompartilhar}
+        onClose={() => setEventoCompartilhar(null)}
+      />
     </div>
   );
 };
