@@ -216,9 +216,9 @@ export const Adopt = () => {
               </Card.Body>
             </Card>
           ) : (
-            <Row className="g-4">
+            <Row className="g-3">
               {animais.map((pet) => (
-                <Col key={pet.id} sm={6} lg={4}>
+                <Col key={pet.id} sm={6} md={4} lg={3}>
                   <PetCard
                     pet={pet}
                     onAdoptClick={(p) => setPetAdocao(p)}

@@ -15,12 +15,16 @@ import {
   Copy,
   Check,
   MessageCircle,
+  MapPin,
 } from 'lucide-react';
 import bannerComoAjudarApia from '../assets/banner-como-ajudar-apia.png';
+import fotoMiagro from '../assets/miagro-loja.jpg';
+import fotoMercadoDeBone from '../assets/mercado-de-bone.png';
+import fotoAmorATerra from '../assets/amor-a-terra.jpg';
 
 export const HowToHelp = () => {
   const [pixCopiado, setPixCopiado] = useState(false);
-  const chavePix = 'contato@apia-lv.org.br';
+  const chavePix = '23.017.944/0001-77';
 
   const [dadosFormulario, setDadosFormulario] = useState({
     name: '',
@@ -132,7 +136,7 @@ export const HowToHelp = () => {
                     className="px-3 py-2 rounded-3 font-monospace small border border-light border-opacity-25"
                     style={{ backgroundColor: 'rgba(255,255,255,0.1)' }}
                   >
-                    {chavePix}
+                    CNPJ: {chavePix}
                   </div>
                   <Button
                     size="sm"
@@ -188,11 +192,30 @@ export const HowToHelp = () => {
           <Row className="g-4">
             <Col md={4}>
               <Card className="h-100 border-0 shadow-sm rounded-4 p-3">
-                <Card.Body>
-                  <h5 className="fw-bold fs-6 text-apia-dark mb-1">Miagro Agrícola</h5>
-                  <p className="small text-muted mb-2">Rua Lauro Júlio Garcez, 327 • Alto Pedregal</p>
-                  <div className="p-2 rounded-3 bg-apia-light text-apia-dark small fw-medium">
-                    Recebe: Ração para cães e gatos, vermífugos e medicamentos.
+                <Card.Body className="d-flex flex-column justify-content-between">
+                  <div>
+                    <h5 className="fw-bold fs-6 text-apia-dark mb-1">Miagro Agrícola</h5>
+                    <a
+                      href="https://www.google.com/maps/search/?api=1&query=Miagro+Agricola+Rua+Lauro+Julio+Garcez+327+Lagoa+Vermelha+RS"
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="small text-muted text-decoration-underline d-inline-flex align-items-center gap-1 mb-2"
+                    >
+                      <MapPin size={13} className="text-apia-orange flex-shrink-0" />
+                      <span>Rua Lauro Júlio Garcez, 327 • Alto Pedregal</span>
+                    </a>
+                    <div className="p-2 rounded-3 bg-apia-light text-apia-dark small fw-medium mb-3">
+                      Recebe: Ração para cães e gatos, vermífugos e medicamentos.
+                    </div>
+                  </div>
+                  <div className="text-center">
+                    <img
+                      src={fotoMiagro}
+                      alt="Fachada da loja Miagro Agrícola"
+                      className="rounded-3 border"
+                      style={{ height: '155px', width: '230px', maxWidth: '100%', objectFit: 'cover' }}
+                      loading="lazy"
+                    />
                   </div>
                 </Card.Body>
               </Card>
@@ -200,11 +223,30 @@ export const HowToHelp = () => {
 
             <Col md={4}>
               <Card className="h-100 border-0 shadow-sm rounded-4 p-3">
-                <Card.Body>
-                  <h5 className="fw-bold fs-6 text-apia-dark mb-1">Mercado de Bone</h5>
-                  <p className="small text-muted mb-2">Avenida Afonso Pena, 223 • Centro</p>
-                  <div className="p-2 rounded-3 bg-apia-light text-apia-dark small fw-medium">
-                    Recebe: Ração e produtos de limpeza e desinfecção.
+                <Card.Body className="d-flex flex-column justify-content-between">
+                  <div>
+                    <h5 className="fw-bold fs-6 text-apia-dark mb-1">Mercado de Bone</h5>
+                    <a
+                      href="https://www.google.com/maps/search/?api=1&query=Mercado+de+Bone+Avenida+Afonso+Pena+223+Lagoa+Vermelha+RS"
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="small text-muted text-decoration-underline d-inline-flex align-items-center gap-1 mb-2"
+                    >
+                      <MapPin size={13} className="text-apia-orange flex-shrink-0" />
+                      <span>Avenida Afonso Pena, 223 • Centro</span>
+                    </a>
+                    <div className="p-2 rounded-3 bg-apia-light text-apia-dark small fw-medium mb-3">
+                      Recebe: Ração e produtos de limpeza e desinfecção.
+                    </div>
+                  </div>
+                  <div className="text-center">
+                    <img
+                      src={fotoMercadoDeBone}
+                      alt="Fachada do Mercado de Bone"
+                      className="rounded-3 border"
+                      style={{ height: '155px', width: '230px', maxWidth: '100%', objectFit: 'cover' }}
+                      loading="lazy"
+                    />
                   </div>
                 </Card.Body>
               </Card>
@@ -212,11 +254,30 @@ export const HowToHelp = () => {
 
             <Col md={4}>
               <Card className="h-100 border-0 shadow-sm rounded-4 p-3">
-                <Card.Body>
-                  <h5 className="fw-bold fs-6 text-apia-dark mb-1">Agropecuária Amor a Terra</h5>
-                  <p className="small text-muted mb-2">Avenida Benjamin Constant, 2291 • Centro</p>
-                  <div className="p-2 rounded-3 bg-apia-light text-apia-dark small fw-medium">
-                    Recebe: Ração premium/filhote, comedouros, caminhas e cobertores.
+                <Card.Body className="d-flex flex-column justify-content-between">
+                  <div>
+                    <h5 className="fw-bold fs-6 text-apia-dark mb-1">Agropecuária Amor a Terra</h5>
+                    <a
+                      href="https://www.google.com/maps/search/?api=1&query=Agropecuaria+Amor+a+Terra+Avenida+Benjamin+Constant+2291+Lagoa+Vermelha+RS"
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="small text-muted text-decoration-underline d-inline-flex align-items-center gap-1 mb-2"
+                    >
+                      <MapPin size={13} className="text-apia-orange flex-shrink-0" />
+                      <span>Avenida Benjamin Constant, 2291 • Centro</span>
+                    </a>
+                    <div className="p-2 rounded-3 bg-apia-light text-apia-dark small fw-medium mb-3">
+                      Recebe: Ração premium/filhote, comedouros, caminhas e cobertores.
+                    </div>
+                  </div>
+                  <div className="text-center">
+                    <img
+                      src={fotoAmorATerra}
+                      alt="Fachada da Agropecuária Amor a Terra"
+                      className="rounded-3 border"
+                      style={{ height: '155px', width: '230px', maxWidth: '100%', objectFit: 'cover' }}
+                      loading="lazy"
+                    />
                   </div>
                 </Card.Body>
               </Card>
@@ -313,7 +374,7 @@ export const HowToHelp = () => {
                     </p>
                   </div>
                   <a
-                    href="https://www.instagram.com/ongapiaoficial/"
+                    href="https://www.instagram.com/ongapia.oficial/"
                     target="_blank"
                     rel="noopener noreferrer"
                     className="small fw-semibold text-apia-orange text-decoration-none"

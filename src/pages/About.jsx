@@ -2,7 +2,7 @@ import Container from 'react-bootstrap/Container';
 import Row from 'react-bootstrap/Row';
 import Col from 'react-bootstrap/Col';
 import Card from 'react-bootstrap/Card';
-import { Heart, GraduationCap, Users, Shield, Mail, Phone, Instagram, Facebook, CheckCircle } from 'lucide-react';
+import { Heart, GraduationCap, Users, Shield, Mail, Phone, Instagram, Facebook } from 'lucide-react';
 import bannerSobreApia from '../assets/banner-sobre-apia.jpg';
 
 export const About = () => {
@@ -107,34 +107,24 @@ export const About = () => {
                   Projeto de Extensão Universitária
                 </h2>
                 <p className="small text-secondary mb-3">
-                  Esta plataforma web integrada foi desenvolvida como atividade prática de extensão no curso de <strong>Bacharelado em Ciência da Computação</strong> do <strong>IFSUL (Campus Lagoa Vermelha)</strong>, unindo conhecimentos técnicos em prol do bem-estar animal.
+                  Esta plataforma web integrada foi desenvolvida como atividade prática de extensão no curso de <strong>Bacharelado em Ciência da Computação</strong> do <strong>IFSUL (Campus Passo Fundo)</strong>, unindo conhecimentos técnicos em prol do bem-estar animal.
                 </p>
 
-                <Row className="g-2 small">
-                  <Col sm={6}>
-                    <div className="d-flex align-items-center gap-2 bg-light p-2 rounded-3 border">
-                      <CheckCircle size={16} className="text-success flex-shrink-0" />
-                      <span>
-                        <strong>Discentes:</strong> Daniel Cipriano da Silva e Gabriel de Oliveira
-                      </span>
-                    </div>
-                  </Col>
-                  <Col sm={6}>
-                    <div className="d-flex align-items-center gap-2 bg-light p-2 rounded-3 border">
-                      <CheckCircle size={16} className="text-success flex-shrink-0" />
-                      <span>
-                        <strong>Docente Orientadora:</strong> Prof. Carmem Vera Scorsatto
-                      </span>
-                    </div>
-                  </Col>
-                </Row>
+                <div className="small text-secondary pt-2 border-top">
+                  <div className="mb-1">
+                    <strong className="text-apia-dark">Discentes:</strong> Daniel Cipriano da Silva e Gabriel de Oliveira
+                  </div>
+                  <div>
+                    <strong className="text-apia-dark">Docente Orientadora:</strong> Prof. Carmem Vera Scorsatto
+                  </div>
+                </div>
               </Col>
 
               <Col md={4} className="text-center">
                 <div className="p-4 bg-light rounded-4 border d-inline-block">
                   <GraduationCap size={44} className="text-apia-dark mb-2" />
                   <div className="fw-bold text-apia-dark small">Ciência da Computação</div>
-                  <small className="text-muted">IFSUL • Passo Fundo - RS</small>
+                  <small className="text-muted">IFSUL • Campus Passo Fundo</small>
                 </div>
               </Col>
             </Row>
@@ -191,12 +181,12 @@ export const About = () => {
                   <Instagram size={24} className="text-success mb-2" />
                   <span className="small text-muted fw-semibold">Instagram</span>
                   <a
-                    href="https://www.instagram.com/ongapiaoficial/"
+                    href="https://www.instagram.com/ongapia.oficial/"
                     target="_blank"
                     rel="noopener noreferrer"
                     className="small fw-bold text-apia-dark text-decoration-none mt-1"
                   >
-                    @ongapiaoficial
+                    @ongapia.oficial
                   </a>
                 </Card.Body>
               </Card>
@@ -208,7 +198,7 @@ export const About = () => {
                   <Facebook size={24} className="text-success mb-2" />
                   <span className="small text-muted fw-semibold">Facebook</span>
                   <a
-                    href="https://www.facebook.com"
+                    href="https://www.facebook.com/ONGapia"
                     target="_blank"
                     rel="noopener noreferrer"
                     className="small fw-bold text-apia-dark text-decoration-none mt-1"

@@ -12,8 +12,6 @@ import { api } from '../services/api.js';
 import logoApia from '../assets/logo-apia.png';
 
 export const Login = () => {
-  const [estaCadastrando, setEstaCadastrando] = useState(false);
-  const [nome, setNome] = useState('');
   const [email, setEmail] = useState('');
   const [senha, setSenha] = useState('');
   const [erro, setErro] = useState(null);
@@ -29,27 +27,9 @@ export const Login = () => {
     setCarregando(true);
 
     try {
-      if (estaCadastrando) {
-        if (!nome.trim()) throw new Error('Por favor, informe seu nome completo.');
-        const resposta = await fetch('/api/auth/register', {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ name: nome, email, password: senha }),
-        });
-        const dados = await resposta.json();
-        if (!resposta.ok) {
-          throw new Error(dados.message || dados.mensagem || 'Falha ao registrar administrador');
-        }
-
-        localStorage.setItem('ong_apia_token', dados.data.token);
-        localStorage.setItem('ong_apia_user', JSON.stringify(dados.data.user));
-        setMensagemSucesso('Cadastro realizado com sucesso! Redirecionando...');
-        setTimeout(() => navigate('/admin'), 800);
-      } else {
-        await api.fazerLogin(email, senha);
-        setMensagemSucesso('Login realizado com sucesso! Redirecionando...');
-        setTimeout(() => navigate('/admin'), 600);
-      }
+      await api.fazerLogin(email, senha);
+      setMensagemSucesso('Login realizado com sucesso! Redirecionando...');
+      setTimeout(() => navigate('/admin'), 600);
     } catch (err) {
       setErro(err.message || 'Ocorreu um erro. Verifique seus dados.');
     } finally {
@@ -80,35 +60,18 @@ export const Login = () => {
               Lagoa Vermelha - RS
             </span>
           </div>
-
-          <div
-            className="p-3 bg-apia-light rounded-3 border text-start small mx-auto"
-            style={{ maxWidth: '300px' }}
-          >
-            <div className="fw-bold text-apia-dark mb-1">🔐 Acesso Administrativo:</div>
-            <div>
-              E-mail padrão: <code>admin@apia.org.br</code>
-            </div>
-            <div>
-              Senha padrão: <code>admin123</code>
-            </div>
-          </div>
         </Col>
 
-        {/* Coluna Direita: Card de Login (estilo gerenciador-pesagens) */}
+        {/* Coluna Direita: Card de Login */}
         <Col md={6} lg={5}>
           <Card
             className="shadow-sm p-4 border-0"
             style={{ backgroundColor: '#f8f9fa', borderRadius: '12px' }}
           >
             <div className="mb-3">
-              <h3 className="h4 fw-bold text-apia-dark mb-1">
-                {estaCadastrando ? 'Criar conta de Administrador' : 'Acesse sua conta'}
-              </h3>
+              <h3 className="h4 fw-bold text-apia-dark mb-1">Acesse sua conta</h3>
               <p className="text-muted small mb-0">
-                {estaCadastrando
-                  ? 'Cadastre um novo membro da equipe autorizada.'
-                  : 'Entre com seu e-mail e senha para continuar.'}
+                Entre com seu e-mail e senha de administrador para continuar.
               </p>
             </div>
 
@@ -127,20 +90,6 @@ export const Login = () => {
             )}
 
             <Form onSubmit={aoSubmeter}>
-              {estaCadastrando && (
-                <Form.Group className="mb-3">
-                  <Form.Label className="fw-semibold small">Nome Completo:</Form.Label>
-                  <Form.Control
-                    type="text"
-                    required
-                    placeholder="Seu nome"
-                    className="bg-white"
-                    value={nome}
-                    onChange={(e) => setNome(e.target.value)}
-                  />
-                </Form.Group>
-              )}
-
               <Form.Group className="mb-3">
                 <Form.Label className="fw-semibold small">E-mail:</Form.Label>
                 <Form.Control
@@ -168,22 +117,9 @@ export const Login = () => {
               <Button
                 type="submit"
                 disabled={carregando}
-                className="btn-apia-orange w-100 py-2 fw-semibold mb-3"
+                className="btn-apia-orange w-100 py-2 fw-semibold mb-2"
               >
-                {carregando ? 'Processando...' : estaCadastrando ? 'Cadastrar' : 'Entrar'}
-              </Button>
-
-              <Button
-                type="button"
-                variant="outline-secondary"
-                className="w-100 py-2 small fw-semibold bg-white"
-                onClick={() => {
-                  setEstaCadastrando(!estaCadastrando);
-                  setErro(null);
-                  setMensagemSucesso(null);
-                }}
-              >
-                {estaCadastrando ? 'Já possui conta? Faça Login' : 'Criar conta de Administrador'}
+                {carregando ? 'Processando...' : 'Entrar'}
               </Button>
 
               <div className="text-center mt-3">

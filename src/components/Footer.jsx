@@ -4,6 +4,7 @@ import Row from 'react-bootstrap/Col';
 import Col from 'react-bootstrap/Col';
 import { Instagram, Facebook, Phone, MapPin, Mail } from 'lucide-react';
 import logoApia from '../assets/logo-apia.png';
+import logoIfsul from '../assets/logo-ifsul.png';
 
 export const Footer = () => {
   return (
@@ -47,18 +48,18 @@ export const Footer = () => {
             <ul className="list-unstyled small mb-0 d-flex flex-column gap-2">
               <li>
                 <a
-                  href="https://www.instagram.com/ongapiaoficial/"
+                  href="https://www.instagram.com/ongapia.oficial/"
                   target="_blank"
                   rel="noopener noreferrer"
                   className="text-white text-decoration-none d-inline-flex align-items-center gap-2 opacity-75"
                 >
                   <Instagram size={15} />
-                  <span>@ongapiaoficial</span>
+                  <span>@ongapia.oficial</span>
                 </a>
               </li>
               <li>
                 <a
-                  href="https://www.facebook.com"
+                  href="https://www.facebook.com/ONGapia"
                   target="_blank"
                   rel="noopener noreferrer"
                   className="text-white text-decoration-none d-inline-flex align-items-center gap-2 opacity-75"
@@ -96,6 +97,13 @@ export const Footer = () => {
             <p className="small text-light opacity-75 mb-3">
               Desenvolvido em parceria com o curso de Ciência da Computação do IFSUL (Práticas em Sociedade III).
             </p>
+            <div className="mb-3">
+              <img
+                src={logoIfsul}
+                alt="IFSUL Câmpus Passo Fundo"
+                style={{ height: '48px', width: 'auto', objectFit: 'contain' }}
+              />
+            </div>
             <div className="d-flex flex-wrap gap-2 justify-content-md-end">
               <Link to="/adotar" className="btn btn-sm btn-outline-apia-light rounded-2">
                 Quero Adotar

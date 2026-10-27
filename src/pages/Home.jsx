@@ -29,7 +29,7 @@ export const Home = () => {
           api.buscarAnimais({ status: 'disponivel' }),
           api.buscarAnimais({ status: 'adotado' }),
         ]);
-        setAnimaisDisponiveis(disponiveis.slice(0, 3));
+        setAnimaisDisponiveis(disponiveis.slice(0, 4));
         setAnimaisAdotados(adotados);
       } catch (erro) {
         console.error('Erro ao carregar dados da página inicial:', erro);
@@ -164,43 +164,7 @@ export const Home = () => {
         </Container>
       </section>
 
-      {/* 3. Projeto de Extensão IFSUL */}
-      <section className="pb-4">
-        <Container>
-          <Card className="border-0 shadow-sm rounded-4 p-4 bg-white">
-            <div className="d-flex flex-column flex-md-row align-items-md-center justify-content-between gap-3">
-              <div className="d-flex align-items-start gap-3">
-                <div
-                  className="rounded-3 bg-apia-dark text-white d-flex align-items-center justify-content-center flex-shrink-0"
-                  style={{ width: '46px', height: '46px' }}
-                >
-                  <GraduationCap size={22} />
-                </div>
-                <div>
-                  <span className="text-uppercase small fw-bold text-success" style={{ fontSize: '0.72rem' }}>
-                    IFSUL • Ciência da Computação
-                  </span>
-                  <h4 className="h6 fw-bold text-apia-dark mt-1 mb-1">
-                    Projeto de Extensão Universitária
-                  </h4>
-                  <p className="small text-muted mb-0" style={{ maxWidth: '680px' }}>
-                    Esta plataforma foi concebida na disciplina de Práticas em Sociedade III, unindo tecnologia e solidariedade para apoiar o trabalho voluntário da ONG APIA e impulsionar a adoção responsável em Lagoa Vermelha.
-                  </p>
-                </div>
-              </div>
-
-              <Link
-                to="/sobre"
-                className="btn bg-apia-light text-apia-dark fw-semibold btn-sm px-3 py-2 rounded-3 d-inline-flex align-items-center gap-1 flex-shrink-0 align-self-start align-self-md-center"
-              >
-                Conhecer o projeto <ArrowRight size={15} />
-              </Link>
-            </div>
-          </Card>
-        </Container>
-      </section>
-
-      {/* 4. Destaques para Adoção */}
+      {/* 3. Destaques para Adoção */}
       <section className="py-5">
         <Container>
           <div className="d-flex flex-column flex-sm-row align-items-sm-center justify-content-between gap-2 mb-4">
@@ -235,9 +199,9 @@ export const Home = () => {
               </Card.Body>
             </Card>
           ) : (
-            <Row className="g-4">
+            <Row className="g-3">
               {animaisDisponiveis.map((pet) => (
-                <Col key={pet.id} sm={6} lg={4}>
+                <Col key={pet.id} sm={6} md={4} lg={3}>
                   <PetCard
                     pet={pet}
                     onAdoptClick={(p) => setPetSelecionadoAdocao(p)}
@@ -250,8 +214,44 @@ export const Home = () => {
         </Container>
       </section>
 
-      {/* 5. Carrossel de Finais Felizes */}
+      {/* 4. Carrossel de Finais Felizes */}
       <HappyTailsCarousel pets={animaisAdotados} />
+
+      {/* 5. Projeto de Extensão IFSUL */}
+      <section className="py-5">
+        <Container>
+          <Card className="border-0 shadow-sm rounded-4 p-4 bg-white">
+            <div className="d-flex flex-column flex-md-row align-items-md-center justify-content-between gap-3">
+              <div className="d-flex align-items-start gap-3">
+                <div
+                  className="rounded-3 bg-apia-dark text-white d-flex align-items-center justify-content-center flex-shrink-0"
+                  style={{ width: '46px', height: '46px' }}
+                >
+                  <GraduationCap size={22} />
+                </div>
+                <div>
+                  <span className="text-uppercase small fw-bold text-success" style={{ fontSize: '0.72rem' }}>
+                    IFSUL • Ciência da Computação
+                  </span>
+                  <h4 className="h6 fw-bold text-apia-dark mt-1 mb-1">
+                    Projeto de Extensão Universitária
+                  </h4>
+                  <p className="small text-muted mb-0" style={{ maxWidth: '680px' }}>
+                    Esta plataforma foi concebida na disciplina de Práticas em Sociedade III, unindo tecnologia e solidariedade para apoiar o trabalho voluntário da ONG APIA e impulsionar a adoção responsável em Lagoa Vermelha.
+                  </p>
+                </div>
+              </div>
+
+              <Link
+                to="/sobre"
+                className="btn bg-apia-light text-apia-dark fw-semibold btn-sm px-3 py-2 rounded-3 d-inline-flex align-items-center gap-1 flex-shrink-0 align-self-start align-self-md-center"
+              >
+                Conhecer o projeto <ArrowRight size={15} />
+              </Link>
+            </div>
+          </Card>
+        </Container>
+      </section>
 
       {/* Modais */}
       <AdoptionModal

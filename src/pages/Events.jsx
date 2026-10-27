@@ -72,7 +72,7 @@ export const Events = () => {
                 <AlertCircle size={36} className="text-muted mb-3" />
                 <h5 className="fw-bold fs-6 text-apia-dark">Nenhum evento ativo no momento</h5>
                 <p className="small text-muted mb-0">
-                  Acompanhe novidades e comunicados no nosso Instagram oficial @ongapiaoficial.
+                  Acompanhe novidades e comunicados no nosso Instagram oficial @ongapia.oficial.
                 </p>
               </Card.Body>
             </Card>
