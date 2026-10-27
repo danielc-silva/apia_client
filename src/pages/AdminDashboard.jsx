@@ -25,9 +25,11 @@ import {
   LogOut,
   AlertCircle,
   Shield,
+  Share2,
 } from 'lucide-react';
 import { api } from '../services/api.js';
 import { ImageCropperModal } from '../components/ImageCropperModal.jsx';
+import { SharePetModal } from '../components/SharePetModal.jsx';
 
 export const AdminDashboard = () => {
   const navigate = useNavigate();
@@ -44,6 +46,7 @@ export const AdminDashboard = () => {
   const [erroEventos, setErroEventos] = useState('');
 
   const [notificacao, setNotificacao] = useState(null);
+  const [petCompartilhar, setPetCompartilhar] = useState(null);
 
   const [modalPetAberto, setModalPetAberto] = useState(false);
   const [idPetEdicao, setIdPetEdicao] = useState(null);
@@ -547,6 +550,15 @@ export const AdminDashboard = () => {
                       </Button>
 
                       <Button
+                        variant="outline-secondary"
+                        size="sm"
+                        onClick={() => setPetCompartilhar(pet)}
+                        title="Compartilhar / Gerar arte para Instagram"
+                      >
+                        <Share2 size={15} />
+                      </Button>
+
+                      <Button
                         variant="outline-primary"
                         size="sm"
                         onClick={() => abrirModalPet(pet)}
@@ -1003,6 +1015,13 @@ export const AdminDashboard = () => {
         isOpen={modalCorteAberto}
         onClose={() => setModalCorteAberto(false)}
         onCropComplete={aoConcluirCorte}
+      />
+
+      {/* MODAL DE COMPARTILHAMENTO DO PET */}
+      <SharePetModal
+        pet={petCompartilhar}
+        isOpen={!!petCompartilhar}
+        onClose={() => setPetCompartilhar(null)}
       />
     </Container>
   );

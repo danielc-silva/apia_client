@@ -8,17 +8,16 @@ import { useStoryGenerator } from '../hooks/useStoryGenerator.js';
 
 export const SharePetModal = ({ pet, isOpen, onClose }) => {
   const [copiado, setCopiado] = useState(false);
-  const [downloadAutomaticoConcluido, setDownloadAutomaticoConcluido] = useState(false);
-  const { gerarStoryPet, gerandoStory, storyPreviewUrl, erroStory } = useStoryGenerator();
+  const [formatoAtivo, setFormatoAtivo] = useState('story');
+  const [formatoBaixado, setFormatoBaixado] = useState(null);
+  const { gerarStoryPet, gerandoStory, storyPreviewUrl, feedPreviewUrl, erroStory } =
+    useStoryGenerator();
 
   useEffect(() => {
     if (isOpen && pet) {
-      setDownloadAutomaticoConcluido(false);
-      gerarStoryPet(pet, { baixarAutomaticamente: true }).then((resultado) => {
-        if (resultado) {
-          setDownloadAutomaticoConcluido(true);
-        }
-      });
+      setFormatoAtivo('story');
+      setFormatoBaixado(null);
+      gerarStoryPet(pet, { baixarAutomaticamente: false });
     }
   }, [isOpen, pet, gerarStoryPet]);
 
@@ -37,29 +36,41 @@ export const SharePetModal = ({ pet, isOpen, onClose }) => {
     window.open(`https://wa.me/?text=${encodeURIComponent(textoCompartilhamento)}`, '_blank');
   };
 
-  const aoBaixarStoryNovamente = () => {
-    gerarStoryPet(pet, { baixarAutomaticamente: true });
+  const aoBaixarArte = async (formato) => {
+    setFormatoAtivo(formato);
+    const resultado = await gerarStoryPet(pet, {
+      baixarAutomaticamente: true,
+      formato,
+    });
+    if (resultado) {
+      setFormatoBaixado(formato);
+    }
   };
+
+  const previewUrlAtual = formatoAtivo === 'feed' ? feedPreviewUrl : storyPreviewUrl;
 
   return (
     <Modal show={isOpen} onHide={onClose} centered size="md">
       <Modal.Header closeButton closeVariant="white" className="bg-apia-dark text-white border-0">
         <Modal.Title className="fs-6 fw-bold d-flex align-items-center gap-2">
           <Share2 size={18} color="#DE5A3A" />
-          Compartilhar {pet.name} nos Stories
+          Compartilhar {pet.name} no Instagram
         </Modal.Title>
       </Modal.Header>
 
       <Modal.Body className="p-4">
-        {downloadAutomaticoConcluido && !erroStory && (
+        {formatoBaixado && !erroStory && (
           <Alert
             variant="success"
             className="py-2 px-3 mb-3 small d-flex align-items-center gap-2 rounded-3"
           >
             <CheckCircle2 size={17} className="flex-shrink-0 text-success" />
             <span>
-              <strong>Story baixado automaticamente!</strong> A imagem (1080×1920 px) já está pronta
-              no seu dispositivo para postar no Instagram Stories.
+              <strong>
+                Imagem para {formatoBaixado === 'feed' ? 'Feed' : 'Story'} baixada com sucesso!
+              </strong>{' '}
+              O arquivo ({formatoBaixado === 'feed' ? '1080×1080 px' : '1080×1920 px'}) já está
+              pronto no seu dispositivo.
             </span>
           </Alert>
         )}
@@ -70,44 +81,89 @@ export const SharePetModal = ({ pet, isOpen, onClose }) => {
           </Alert>
         )}
 
-        {/* Pré-visualização da arte 9:16 gerada no Canvas */}
+        {/* Alternador de visualização entre Story (9:16) e Feed (1:1) */}
+        <div className="d-flex justify-content-center gap-2 mb-2">
+          <Button
+            size="sm"
+            variant={formatoAtivo === 'story' ? 'dark' : 'outline-secondary'}
+            onClick={() => setFormatoAtivo('story')}
+            className="rounded-pill px-3 py-1 small"
+          >
+            Prévia Story
+          </Button>
+          <Button
+            size="sm"
+            variant={formatoAtivo === 'feed' ? 'dark' : 'outline-secondary'}
+            onClick={() => setFormatoAtivo('feed')}
+            className="rounded-pill px-3 py-1 small"
+          >
+            Prévia Feed
+          </Button>
+        </div>
+
+        {/* Pré-visualização da arte gerada no Canvas */}
         <div
           className="rounded-4 overflow-hidden border mb-3 shadow-sm bg-apia-dark d-flex align-items-center justify-content-center mx-auto"
-          style={{ maxWidth: '250px', aspectRatio: '9 / 16' }}
+          style={{
+            maxWidth: formatoAtivo === 'feed' ? '300px' : '240px',
+            aspectRatio: formatoAtivo === 'feed' ? '1 / 1' : '9 / 16',
+          }}
         >
-          {gerandoStory && !storyPreviewUrl ? (
+          {gerandoStory && !previewUrlAtual ? (
             <div className="text-center text-white p-4">
               <Spinner animation="border" variant="light" size="sm" className="mb-2" />
-              <div className="small">Montando arte 1080×1920 para o Instagram Stories...</div>
+              <div className="small">Montando arte para o Instagram...</div>
             </div>
-          ) : storyPreviewUrl ? (
+          ) : previewUrlAtual ? (
             <img
-              src={storyPreviewUrl}
-              alt={`Arte de Story para adoção de ${pet.name}`}
+              src={previewUrlAtual}
+              alt={`Arte de ${formatoAtivo === 'feed' ? 'Feed' : 'Story'} para adoção de ${pet.name}`}
               className="w-100 h-100 object-fit-contain d-block"
             />
           ) : null}
         </div>
 
-        {/* Botão de Download para Instagram Stories */}
-        <Button
-          onClick={aoBaixarStoryNovamente}
-          disabled={gerandoStory}
-          className="btn-apia-orange w-100 py-2 mb-3 rounded-3 d-inline-flex align-items-center justify-content-center gap-2 small fw-bold shadow-sm"
-        >
-          {gerandoStory ? (
-            <>
-              <Spinner animation="border" size="sm" />
-              Gerando imagem 1080×1920...
-            </>
-          ) : (
-            <>
-              <Instagram size={17} />
-              <Download size={16} />
-              Baixar Imagem para Story (PNG)
-            </>
-          )}
-        </Button>
+        {/* Botões lado a lado: Baixe para Story | Baixe para Feed */}
+        <div className="row g-2 mb-3">
+          <div className="col-6">
+            <Button
+              onClick={() => aoBaixarArte('story')}
+              disabled={gerandoStory}
+              className="btn-apia-orange w-100 py-2 rounded-3 d-inline-flex align-items-center justify-content-center gap-1 small fw-bold shadow-sm"
+            >
+              {gerandoStory && formatoAtivo === 'story' ? (
+                <>
+                  <Spinner animation="border" size="sm" />
+                  Gerando...
+                </>
+              ) : (
+                <>
+                  <Download size={15} />
+                  Story
+                </>
+              )}
+            </Button>
+          </div>
+          <div className="col-6">
+            <Button
+              onClick={() => aoBaixarArte('feed')}
+              disabled={gerandoStory}
+              className="btn-apia-orange w-100 py-2 rounded-3 d-inline-flex align-items-center justify-content-center gap-1 small fw-bold shadow-sm"
+            >
+              {gerandoStory && formatoAtivo === 'feed' ? (
+                <>
+                  <Spinner animation="border" size="sm" />
+                  Gerando...
+                </>
+              ) : (
+                <>
+                  <Download size={15} />
+                  Feed
+                </>
+              )}
+            </Button>
+          </div>
+        </div>
 
         {/* Texto para cópia */}
         <div className="mb-3">

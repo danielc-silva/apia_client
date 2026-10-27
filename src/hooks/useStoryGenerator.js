@@ -4,6 +4,9 @@ import logoApiaSrc from '../assets/logo-apia.png';
 const STORY_WIDTH = 1080;
 const STORY_HEIGHT = 1920;
 
+const FEED_WIDTH = 1080;
+const FEED_HEIGHT = 1080;
+
 const CORES = {
   verdeEscuro: '#1E4633',
   verdeMaisEscuro: '#122C20',
@@ -127,15 +130,441 @@ function formatarSaude(pet) {
   return 'Avaliado pela ONG';
 }
 
+function obterAtributosPet(pet) {
+  return [
+    { rotulo: 'IDADE', valor: pet.age || 'Não informada' },
+    { rotulo: 'PORTE', valor: formatarPorte(pet.size) },
+    { rotulo: 'SEXO', valor: formatarSexo(pet.gender) },
+    { rotulo: 'CUIDADOS', valor: formatarSaude(pet) },
+  ];
+}
+
 /**
- * Hook customizado para geração e download automático de imagem 1080x1920 (Instagram Stories).
+ * Renderiza o canvas 1080x1920 (Story 9:16)
+ */
+function desenharCanvasStory(pet, imgPet, imgLogo) {
+  const canvas = document.createElement('canvas');
+  canvas.width = STORY_WIDTH;
+  canvas.height = STORY_HEIGHT;
+  const ctx = canvas.getContext('2d');
+
+  // 1. FUNDO INSTITUCIONAL
+  const gradFundo = ctx.createLinearGradient(0, 0, 0, STORY_HEIGHT);
+  gradFundo.addColorStop(0, CORES.verdeEscuro);
+  gradFundo.addColorStop(0.6, '#183929');
+  gradFundo.addColorStop(1, CORES.verdeMaisEscuro);
+  ctx.fillStyle = gradFundo;
+  ctx.fillRect(0, 0, STORY_WIDTH, STORY_HEIGHT);
+
+  // 2. CABEÇALHO COM LOGOTIPO OFICIAL DA APIA + TÍTULO EM DESTAQUE
+  const headerY = 275;
+
+  ctx.save();
+  desenharRetanguloArredondado(ctx, 220, headerY, 640, 114, 30);
+  ctx.fillStyle = 'rgba(255, 255, 255, 0.96)';
+  ctx.shadowColor = 'rgba(0, 0, 0, 0.22)';
+  ctx.shadowBlur = 20;
+  ctx.shadowOffsetY = 6;
+  ctx.fill();
+  ctx.restore();
+
+  if (imgLogo) {
+    const alturaLogo = 82;
+    const larguraLogo = (imgLogo.naturalWidth / imgLogo.naturalHeight) * alturaLogo;
+    ctx.drawImage(imgLogo, 252, headerY + 16, larguraLogo, alturaLogo);
+  }
+
+  ctx.save();
+  ctx.textAlign = 'left';
+  ctx.fillStyle = '#E32626';
+  ctx.font = '800 34px Montserrat, Inter, Poppins, sans-serif';
+  ctx.fillText('ONG APIA', 402, headerY + 46);
+
+  ctx.fillStyle = CORES.verdeEscuro;
+  ctx.font = '700 18px Inter, Poppins, sans-serif';
+  ctx.fillText('Protetores Incondicionais dos Animais', 402, headerY + 73);
+
+  ctx.fillStyle = CORES.laranja;
+  ctx.font = '700 17px Montserrat, Inter, sans-serif';
+  ctx.fillText('LAGOA VERMELHA - RS', 402, headerY + 97);
+  ctx.restore();
+
+  // Faixa Laranja Principal: "🐾 ADOTE UM AMIGO! 🐾"
+  const bannerY = headerY + 136; // 411
+  ctx.save();
+  desenharRetanguloArredondado(ctx, 190, bannerY, 700, 76, 38);
+  ctx.fillStyle = CORES.laranja;
+  ctx.shadowColor = 'rgba(0, 0, 0, 0.25)';
+  ctx.shadowBlur = 18;
+  ctx.shadowOffsetY = 6;
+  ctx.fill();
+
+  ctx.textAlign = 'center';
+  ctx.textBaseline = 'middle';
+  ctx.fillStyle = CORES.branco;
+  ctx.font = '800 36px Inter, Poppins, sans-serif';
+  ctx.fillText('🐾 ADOTE UM AMIGO! 🐾', STORY_WIDTH / 2, bannerY + 40);
+  ctx.restore();
+
+  // 3. CARD CENTRAL BRANCO
+  const cardX = 110;
+  const cardY = bannerY + 102; // 513
+  const cardW = 860;
+  const cardH = 916;
+
+  ctx.save();
+  desenharRetanguloArredondado(ctx, cardX, cardY, cardW, cardH, 40);
+  ctx.fillStyle = CORES.branco;
+  ctx.shadowColor = 'rgba(0, 0, 0, 0.34)';
+  ctx.shadowBlur = 36;
+  ctx.shadowOffsetY = 16;
+  ctx.fill();
+  ctx.restore();
+
+  // Imagem do Pet (480 x 440 px)
+  const fotoW = 480;
+  const fotoH = 440;
+  const fotoX = (STORY_WIDTH - fotoW) / 2;
+  const fotoY = cardY + 34;
+
+  ctx.save();
+  desenharRetanguloArredondado(ctx, fotoX - 6, fotoY - 6, fotoW + 12, fotoH + 12, 32);
+  ctx.fillStyle = CORES.verdeClaro;
+  ctx.fill();
+  ctx.restore();
+
+  desenharImagemCover(ctx, imgPet, fotoX, fotoY, fotoW, fotoH, 26);
+
+  // Badge de espécie
+  const textoEspecie = pet.species === 'gato' ? '🐱 GATO PARA ADOÇÃO' : '🐶 CÃO PARA ADOÇÃO';
+  ctx.save();
+  desenharRetanguloArredondado(ctx, (STORY_WIDTH - 260) / 2, fotoY + fotoH - 24, 260, 44, 22);
+  ctx.fillStyle = CORES.verdeEscuro;
+  ctx.shadowColor = 'rgba(0, 0, 0, 0.2)';
+  ctx.shadowBlur = 10;
+  ctx.fill();
+  ctx.fillStyle = CORES.branco;
+  ctx.font = '700 19px Inter, Poppins, sans-serif';
+  ctx.textAlign = 'center';
+  ctx.textBaseline = 'middle';
+  ctx.fillText(textoEspecie, STORY_WIDTH / 2, fotoY + fotoH - 2);
+  ctx.restore();
+
+  // Nome do Pet
+  const nomeY = fotoY + fotoH + 74;
+  ctx.save();
+  ctx.textAlign = 'center';
+  ctx.textBaseline = 'alphabetic';
+  ctx.fillStyle = CORES.verdeEscuro;
+  ctx.font = '800 54px Inter, Poppins, sans-serif';
+  const nomeTruncado = truncarTexto(ctx, (pet.name || 'Amigo').toUpperCase(), cardW - 80);
+  ctx.fillText(nomeTruncado, STORY_WIDTH / 2, nomeY);
+
+  // Subtítulo
+  const subtitulo =
+    pet.temperament ||
+    pet.description ||
+    'Dócil, carinhoso e esperando por uma família responsável!';
+  ctx.fillStyle = CORES.cinzaTexto;
+  ctx.font = '500 24px Inter, Poppins, sans-serif';
+  const subtituloTruncado = truncarTexto(ctx, subtitulo, cardW - 90);
+  ctx.fillText(subtituloTruncado, STORY_WIDTH / 2, nomeY + 38);
+  ctx.restore();
+
+  // Grade 2x2 de atributos do Pet
+  const atributos = obterAtributosPet(pet);
+  const gradeX = cardX + 36;
+  const gradeY = nomeY + 66;
+  const gap = 18;
+  const boxW = (cardW - 72 - gap) / 2;
+  const boxH = 100;
+
+  atributos.forEach((item, index) => {
+    const col = index % 2;
+    const row = Math.floor(index / 2);
+    const bx = gradeX + col * (boxW + gap);
+    const by = gradeY + row * (boxH + gap);
+
+    ctx.save();
+    desenharRetanguloArredondado(ctx, bx, by, boxW, boxH, 22);
+    ctx.fillStyle = CORES.verdeClaro;
+    ctx.fill();
+    ctx.strokeStyle = CORES.bordaSuave;
+    ctx.lineWidth = 2;
+    ctx.stroke();
+
+    ctx.textAlign = 'center';
+    ctx.fillStyle = CORES.cinzaTexto;
+    ctx.font = '700 18px Inter, Poppins, sans-serif';
+    ctx.fillText(item.rotulo, bx + boxW / 2, by + 35);
+
+    ctx.fillStyle = CORES.grafite;
+    ctx.font = '800 28px Inter, Poppins, sans-serif';
+    const valorTruncado = truncarTexto(ctx, item.valor, boxW - 28);
+    ctx.fillText(valorTruncado, bx + boxW / 2, by + 74);
+    ctx.restore();
+  });
+
+  // 4. RODAPÉ COMPACTO
+  const footerTextoY = cardY + cardH + 46; // 1475
+  ctx.save();
+  ctx.textAlign = 'center';
+  ctx.fillStyle = CORES.verdeMenta;
+  ctx.font = '600 26px Inter, Poppins, sans-serif';
+  ctx.fillText(
+    'Quer adotar ou ajudar? Fale conosco nas redes sociais!',
+    STORY_WIDTH / 2,
+    footerTextoY
+  );
+  ctx.restore();
+
+  const ctaX = 140;
+  const ctaY = footerTextoY + 22;
+  const ctaW = STORY_WIDTH - 280;
+  const ctaH = 132;
+
+  ctx.save();
+  desenharRetanguloArredondado(ctx, ctaX, ctaY, ctaW, ctaH, 34);
+  ctx.fillStyle = 'rgba(255, 255, 255, 0.12)';
+  ctx.fill();
+  ctx.strokeStyle = 'rgba(255, 255, 255, 0.25)';
+  ctx.lineWidth = 2;
+  ctx.stroke();
+
+  ctx.textAlign = 'center';
+  ctx.fillStyle = CORES.branco;
+  ctx.font = '800 35px Inter, Poppins, sans-serif';
+  ctx.fillText('📸 @ongapia.oficial', STORY_WIDTH / 2, ctaY + 56);
+
+  ctx.fillStyle = CORES.verdeMenta;
+  ctx.font = '700 26px Inter, Poppins, sans-serif';
+  ctx.fillText('WhatsApp: (54) 99654-6910', STORY_WIDTH / 2, ctaY + 102);
+  ctx.restore();
+
+  return canvas;
+}
+
+/**
+ * Renderiza o canvas 1080x1080 (Feed 1:1 do Instagram)
+ */
+function desenharCanvasFeed(pet, imgPet, imgLogo) {
+  const canvas = document.createElement('canvas');
+  canvas.width = FEED_WIDTH;
+  canvas.height = FEED_HEIGHT;
+  const ctx = canvas.getContext('2d');
+
+  // 1. FUNDO INSTITUCIONAL
+  const gradFundo = ctx.createLinearGradient(0, 0, 0, FEED_HEIGHT);
+  gradFundo.addColorStop(0, CORES.verdeEscuro);
+  gradFundo.addColorStop(0.6, '#183929');
+  gradFundo.addColorStop(1, CORES.verdeMaisEscuro);
+  ctx.fillStyle = gradFundo;
+  ctx.fillRect(0, 0, FEED_WIDTH, FEED_HEIGHT);
+
+  // 2. CABEÇALHO SUPERIOR (Logo APIA à esquerda + Faixa Adote um Amigo à direita)
+  const topY = 30;
+  const headerH = 92;
+
+  // Bloco branco da ONG APIA
+  ctx.save();
+  desenharRetanguloArredondado(ctx, 60, topY, 540, headerH, 26);
+  ctx.fillStyle = 'rgba(255, 255, 255, 0.96)';
+  ctx.shadowColor = 'rgba(0, 0, 0, 0.22)';
+  ctx.shadowBlur = 16;
+  ctx.shadowOffsetY = 5;
+  ctx.fill();
+  ctx.restore();
+
+  if (imgLogo) {
+    const alturaLogo = 66;
+    const larguraLogo = (imgLogo.naturalWidth / imgLogo.naturalHeight) * alturaLogo;
+    ctx.drawImage(imgLogo, 82, topY + 13, larguraLogo, alturaLogo);
+  }
+
+  ctx.save();
+  ctx.textAlign = 'left';
+  ctx.fillStyle = '#E32626';
+  ctx.font = '800 28px Montserrat, Inter, Poppins, sans-serif';
+  ctx.fillText('ONG APIA', 204, topY + 37);
+
+  ctx.fillStyle = CORES.verdeEscuro;
+  ctx.font = '700 15px Inter, Poppins, sans-serif';
+  ctx.fillText('Protetores Incondicionais dos Animais', 204, topY + 59);
+
+  ctx.fillStyle = CORES.laranja;
+  ctx.font = '700 14px Montserrat, Inter, sans-serif';
+  ctx.fillText('LAGOA VERMELHA - RS', 204, topY + 79);
+  ctx.restore();
+
+  // Bloco Laranja "🐾 ADOTE UM AMIGO! 🐾" ao lado
+  ctx.save();
+  desenharRetanguloArredondado(ctx, 620, topY + 8, 400, 76, 38);
+  ctx.fillStyle = CORES.laranja;
+  ctx.shadowColor = 'rgba(0, 0, 0, 0.25)';
+  ctx.shadowBlur = 16;
+  ctx.shadowOffsetY = 5;
+  ctx.fill();
+
+  ctx.textAlign = 'center';
+  ctx.textBaseline = 'middle';
+  ctx.fillStyle = CORES.branco;
+  ctx.font = '800 26px Inter, Poppins, sans-serif';
+  ctx.fillText('🐾 ADOTE UM AMIGO! 🐾', 820, topY + 46);
+  ctx.restore();
+
+  // 3. CARD CENTRAL BRANCO DO PET
+  const cardX = 60;
+  const cardY = 144;
+  const cardW = 960;
+  const cardH = 776; // Termina em 920
+
+  ctx.save();
+  desenharRetanguloArredondado(ctx, cardX, cardY, cardW, cardH, 36);
+  ctx.fillStyle = CORES.branco;
+  ctx.shadowColor = 'rgba(0, 0, 0, 0.32)';
+  ctx.shadowBlur = 30;
+  ctx.shadowOffsetY = 12;
+  ctx.fill();
+  ctx.restore();
+
+  // Foto do Pet centralizada no card (430 x 380 px)
+  const fotoW = 430;
+  const fotoH = 380;
+  const fotoX = (FEED_WIDTH - fotoW) / 2;
+  const fotoY = cardY + 26; // 170
+
+  ctx.save();
+  desenharRetanguloArredondado(ctx, fotoX - 6, fotoY - 6, fotoW + 12, fotoH + 12, 28);
+  ctx.fillStyle = CORES.verdeClaro;
+  ctx.fill();
+  ctx.restore();
+
+  desenharImagemCover(ctx, imgPet, fotoX, fotoY, fotoW, fotoH, 22);
+
+  // Badge de espécie
+  const textoEspecie = pet.species === 'gato' ? '🐱 GATO PARA ADOÇÃO' : '🐶 CÃO PARA ADOÇÃO';
+  ctx.save();
+  desenharRetanguloArredondado(ctx, (FEED_WIDTH - 250) / 2, fotoY + fotoH - 22, 250, 42, 21);
+  ctx.fillStyle = CORES.verdeEscuro;
+  ctx.shadowColor = 'rgba(0, 0, 0, 0.2)';
+  ctx.shadowBlur = 8;
+  ctx.fill();
+  ctx.fillStyle = CORES.branco;
+  ctx.font = '700 18px Inter, Poppins, sans-serif';
+  ctx.textAlign = 'center';
+  ctx.textBaseline = 'middle';
+  ctx.fillText(textoEspecie, FEED_WIDTH / 2, fotoY + fotoH - 1);
+  ctx.restore();
+
+  // Nome do Pet
+  const nomeY = fotoY + fotoH + 64; // 614
+  ctx.save();
+  ctx.textAlign = 'center';
+  ctx.textBaseline = 'alphabetic';
+  ctx.fillStyle = CORES.verdeEscuro;
+  ctx.font = '800 48px Inter, Poppins, sans-serif';
+  const nomeTruncado = truncarTexto(ctx, (pet.name || 'Amigo').toUpperCase(), cardW - 80);
+  ctx.fillText(nomeTruncado, FEED_WIDTH / 2, nomeY);
+
+  // Subtítulo
+  const subtitulo =
+    pet.temperament ||
+    pet.description ||
+    'Dócil, carinhoso e esperando por uma família responsável!';
+  ctx.fillStyle = CORES.cinzaTexto;
+  ctx.font = '500 22px Inter, Poppins, sans-serif';
+  const subtituloTruncado = truncarTexto(ctx, subtitulo, cardW - 90);
+  ctx.fillText(subtituloTruncado, FEED_WIDTH / 2, nomeY + 34);
+  ctx.restore();
+
+  // Grade 2x2 de atributos do Pet
+  const atributos = obterAtributosPet(pet);
+  const gradeX = cardX + 36;
+  const gradeY = nomeY + 56; // 670
+  const gap = 16;
+  const boxW = (cardW - 72 - gap) / 2;
+  const boxH = 92;
+
+  atributos.forEach((item, index) => {
+    const col = index % 2;
+    const row = Math.floor(index / 2);
+    const bx = gradeX + col * (boxW + gap);
+    const by = gradeY + row * (boxH + gap);
+
+    ctx.save();
+    desenharRetanguloArredondado(ctx, bx, by, boxW, boxH, 20);
+    ctx.fillStyle = CORES.verdeClaro;
+    ctx.fill();
+    ctx.strokeStyle = CORES.bordaSuave;
+    ctx.lineWidth = 2;
+    ctx.stroke();
+
+    ctx.textAlign = 'center';
+    ctx.fillStyle = CORES.cinzaTexto;
+    ctx.font = '700 16px Inter, Poppins, sans-serif';
+    ctx.fillText(item.rotulo, bx + boxW / 2, by + 32);
+
+    ctx.fillStyle = CORES.grafite;
+    ctx.font = '800 25px Inter, Poppins, sans-serif';
+    const valorTruncado = truncarTexto(ctx, item.valor, boxW - 24);
+    ctx.fillText(valorTruncado, bx + boxW / 2, by + 68);
+    ctx.restore();
+  });
+
+  // 4. RODAPÉ COMPACTO (Instagram + WhatsApp)
+  const ctaX = 60;
+  const ctaY = 942;
+  const ctaW = 960;
+  const ctaH = 108;
+
+  ctx.save();
+  desenharRetanguloArredondado(ctx, ctaX, ctaY, ctaW, ctaH, 28);
+  ctx.fillStyle = 'rgba(255, 255, 255, 0.12)';
+  ctx.fill();
+  ctx.strokeStyle = 'rgba(255, 255, 255, 0.25)';
+  ctx.lineWidth = 2;
+  ctx.stroke();
+
+  ctx.textAlign = 'center';
+  ctx.fillStyle = CORES.verdeMenta;
+  ctx.font = '600 21px Inter, Poppins, sans-serif';
+  ctx.fillText(
+    'Quer adotar ou ajudar? Entre em contato conosco:',
+    FEED_WIDTH / 2,
+    ctaY + 36
+  );
+
+  ctx.fillStyle = CORES.branco;
+  ctx.font = '800 28px Inter, Poppins, sans-serif';
+  ctx.fillText(
+    '📸 @ongapia.oficial   •   WhatsApp: (54) 99654-6910',
+    FEED_WIDTH / 2,
+    ctaY + 80
+  );
+  ctx.restore();
+
+  return canvas;
+}
+
+function canvasParaBlob(canvas) {
+  return new Promise((resolve, reject) => {
+    canvas.toBlob((b) => {
+      if (b) resolve(b);
+      else reject(new Error('Não foi possível exportar a imagem.'));
+    }, 'image/png');
+  });
+}
+
+/**
+ * Hook customizado para geração e download de imagens para Instagram Story (1080x1920) e Feed (1080x1080).
  */
 export function useStoryGenerator() {
   const [gerandoStory, setGerandoStory] = useState(false);
   const [storyPreviewUrl, setStoryPreviewUrl] = useState(null);
+  const [feedPreviewUrl, setFeedPreviewUrl] = useState(null);
   const [erroStory, setErroStory] = useState(null);
 
-  const dispararDownloadBlob = useCallback((blob, nomePet) => {
+  const dispararDownloadBlob = useCallback((blob, nomePet, formato = 'story') => {
     const nomeLimpo = (nomePet || 'pet')
       .normalize('NFD')
       .replace(/[\u0300-\u036f]/g, '')
@@ -143,10 +572,11 @@ export function useStoryGenerator() {
       .replace(/[^a-z0-9]+/g, '-')
       .replace(/^-+|-+$/g, '');
 
+    const prefixo = formato === 'feed' ? 'feed' : 'story';
     const urlBlob = URL.createObjectURL(blob);
     const link = document.createElement('a');
     link.href = urlBlob;
-    link.download = `story-adote-${nomeLimpo || 'amigo'}-apia.png`;
+    link.download = `${prefixo}-adote-${nomeLimpo || 'amigo'}-apia.png`;
     document.body.appendChild(link);
     link.click();
     document.body.removeChild(link);
@@ -154,7 +584,7 @@ export function useStoryGenerator() {
   }, []);
 
   const gerarStoryPet = useCallback(
-    async (pet, { baixarAutomaticamente = true } = {}) => {
+    async (pet, { baixarAutomaticamente = false, formato = 'story' } = {}) => {
       if (!pet) return null;
 
       setGerandoStory(true);
@@ -170,242 +600,36 @@ export function useStoryGenerator() {
           carregarImagemSegura(logoApiaSrc).catch(() => null),
         ]);
 
-        const canvas = document.createElement('canvas');
-        canvas.width = STORY_WIDTH;
-        canvas.height = STORY_HEIGHT;
-        const ctx = canvas.getContext('2d');
+        const canvasStory = desenharCanvasStory(pet, imgPet, imgLogo);
+        const canvasFeed = desenharCanvasFeed(pet, imgPet, imgLogo);
 
-        // =========================================================================
-        // 1. FUNDO INSTITUCIONAL LIMPO COM AMPLAS MARGENS SUPERIOR E INFERIOR
-        // (Margem superior limpa: 0 a 275px | Margem inferior limpa: 1645px a 1920px)
-        // =========================================================================
-        const gradFundo = ctx.createLinearGradient(0, 0, 0, STORY_HEIGHT);
-        gradFundo.addColorStop(0, CORES.verdeEscuro);
-        gradFundo.addColorStop(0.6, '#183929');
-        gradFundo.addColorStop(1, CORES.verdeMaisEscuro);
-        ctx.fillStyle = gradFundo;
-        ctx.fillRect(0, 0, STORY_WIDTH, STORY_HEIGHT);
+        const [blobStory, blobFeed] = await Promise.all([
+          canvasParaBlob(canvasStory),
+          canvasParaBlob(canvasFeed),
+        ]);
 
-        // =========================================================================
-        // 2. CABEÇALHO COM LOGOTIPO OFICIAL DA APIA + TÍTULO EM DESTAQUE
-        // =========================================================================
-        const headerY = 275;
+        const dataUrlStory = canvasStory.toDataURL('image/png');
+        const dataUrlFeed = canvasFeed.toDataURL('image/png');
 
-        ctx.save();
-        desenharRetanguloArredondado(ctx, 220, headerY, 640, 114, 30);
-        ctx.fillStyle = 'rgba(255, 255, 255, 0.96)';
-        ctx.shadowColor = 'rgba(0, 0, 0, 0.22)';
-        ctx.shadowBlur = 20;
-        ctx.shadowOffsetY = 6;
-        ctx.fill();
-        ctx.restore();
+        setStoryPreviewUrl(dataUrlStory);
+        setFeedPreviewUrl(dataUrlFeed);
 
-        if (imgLogo) {
-          const alturaLogo = 82;
-          const larguraLogo = (imgLogo.naturalWidth / imgLogo.naturalHeight) * alturaLogo;
-          ctx.drawImage(imgLogo, 252, headerY + 16, larguraLogo, alturaLogo);
-        }
-
-        ctx.save();
-        ctx.textAlign = 'left';
-        ctx.fillStyle = '#E32626';
-        ctx.font = '800 34px Montserrat, Inter, Poppins, sans-serif';
-        ctx.fillText('ONG APIA', 402, headerY + 46);
-
-        ctx.fillStyle = CORES.verdeEscuro;
-        ctx.font = '700 18px Inter, Poppins, sans-serif';
-        ctx.fillText('Protetores Incondicionais dos Animais', 402, headerY + 73);
-
-        ctx.fillStyle = CORES.laranja;
-        ctx.font = '700 17px Montserrat, Inter, sans-serif';
-        ctx.fillText('LAGOA VERMELHA - RS', 402, headerY + 97);
-        ctx.restore();
-
-        // Faixa Laranja Principal: "🐾 ADOTE UM AMIGO! 🐾"
-        const bannerY = headerY + 136; // 411
-        ctx.save();
-        desenharRetanguloArredondado(ctx, 190, bannerY, 700, 76, 38);
-        ctx.fillStyle = CORES.laranja;
-        ctx.shadowColor = 'rgba(0, 0, 0, 0.25)';
-        ctx.shadowBlur = 18;
-        ctx.shadowOffsetY = 6;
-        ctx.fill();
-
-        ctx.textAlign = 'center';
-        ctx.textBaseline = 'middle';
-        ctx.fillStyle = CORES.branco;
-        ctx.font = '800 36px Inter, Poppins, sans-serif';
-        ctx.fillText('🐾 ADOTE UM AMIGO! 🐾', STORY_WIDTH / 2, bannerY + 40);
-        ctx.restore();
-
-        // =========================================================================
-        // 3. CARD CENTRAL BRANCO COM IMAGEM DO PET MENOR E CENTRALIZADA
-        // =========================================================================
-        const cardX = 110;
-        const cardY = bannerY + 102; // 513
-        const cardW = 860;
-        const cardH = 916;
-
-        ctx.save();
-        desenharRetanguloArredondado(ctx, cardX, cardY, cardW, cardH, 40);
-        ctx.fillStyle = CORES.branco;
-        ctx.shadowColor = 'rgba(0, 0, 0, 0.34)';
-        ctx.shadowBlur = 36;
-        ctx.shadowOffsetY = 16;
-        ctx.fill();
-        ctx.restore();
-
-        // Imagem do Pet menor e centralizada (480 x 440 px)
-        const fotoW = 480;
-        const fotoH = 440;
-        const fotoX = (STORY_WIDTH - fotoW) / 2;
-        const fotoY = cardY + 34;
-
-        // Moldura suave ao redor da foto do pet
-        ctx.save();
-        desenharRetanguloArredondado(ctx, fotoX - 6, fotoY - 6, fotoW + 12, fotoH + 12, 32);
-        ctx.fillStyle = CORES.verdeClaro;
-        ctx.fill();
-        ctx.restore();
-
-        desenharImagemCover(ctx, imgPet, fotoX, fotoY, fotoW, fotoH, 26);
-
-        // Badge de espécie centralizado na base da foto
-        const textoEspecie = pet.species === 'gato' ? '🐱 GATO PARA ADOÇÃO' : '🐶 CÃO PARA ADOÇÃO';
-        ctx.save();
-        desenharRetanguloArredondado(ctx, (STORY_WIDTH - 260) / 2, fotoY + fotoH - 24, 260, 44, 22);
-        ctx.fillStyle = CORES.verdeEscuro;
-        ctx.shadowColor = 'rgba(0, 0, 0, 0.2)';
-        ctx.shadowBlur = 10;
-        ctx.fill();
-        ctx.fillStyle = CORES.branco;
-        ctx.font = '700 19px Inter, Poppins, sans-serif';
-        ctx.textAlign = 'center';
-        ctx.textBaseline = 'middle';
-        ctx.fillText(textoEspecie, STORY_WIDTH / 2, fotoY + fotoH - 2);
-        ctx.restore();
-
-        // Nome do Pet em destaque
-        const nomeY = fotoY + fotoH + 74;
-        ctx.save();
-        ctx.textAlign = 'center';
-        ctx.textBaseline = 'alphabetic';
-        ctx.fillStyle = CORES.verdeEscuro;
-        ctx.font = '800 54px Inter, Poppins, sans-serif';
-        const nomeTruncado = truncarTexto(ctx, (pet.name || 'Amigo').toUpperCase(), cardW - 80);
-        ctx.fillText(nomeTruncado, STORY_WIDTH / 2, nomeY);
-
-        // Subtítulo (temperamento / descrição curta)
-        const subtitulo =
-          pet.temperament ||
-          pet.description ||
-          'Dócil, carinhoso e esperando por uma família responsável!';
-        ctx.fillStyle = CORES.cinzaTexto;
-        ctx.font = '500 24px Inter, Poppins, sans-serif';
-        const subtituloTruncado = truncarTexto(ctx, subtitulo, cardW - 90);
-        ctx.fillText(subtituloTruncado, STORY_WIDTH / 2, nomeY + 38);
-        ctx.restore();
-
-        // Grade 2x2 de atributos do Pet (Idade, Porte, Sexo, Cuidados)
-        const atributos = [
-          { rotulo: 'IDADE', valor: pet.age || 'Não informada' },
-          { rotulo: 'PORTE', valor: formatarPorte(pet.size) },
-          { rotulo: 'SEXO', valor: formatarSexo(pet.gender) },
-          { rotulo: 'CUIDADOS', valor: formatarSaude(pet) },
-        ];
-
-        const gradeX = cardX + 36;
-        const gradeY = nomeY + 66;
-        const gap = 18;
-        const boxW = (cardW - 72 - gap) / 2;
-        const boxH = 100;
-
-        atributos.forEach((item, index) => {
-          const col = index % 2;
-          const row = Math.floor(index / 2);
-          const bx = gradeX + col * (boxW + gap);
-          const by = gradeY + row * (boxH + gap);
-
-          ctx.save();
-          desenharRetanguloArredondado(ctx, bx, by, boxW, boxH, 22);
-          ctx.fillStyle = CORES.verdeClaro;
-          ctx.fill();
-          ctx.strokeStyle = CORES.bordaSuave;
-          ctx.lineWidth = 2;
-          ctx.stroke();
-
-          ctx.textAlign = 'center';
-          ctx.fillStyle = CORES.cinzaTexto;
-          ctx.font = '700 18px Inter, Poppins, sans-serif';
-          ctx.fillText(item.rotulo, bx + boxW / 2, by + 35);
-
-          ctx.fillStyle = CORES.grafite;
-          ctx.font = '800 28px Inter, Poppins, sans-serif';
-          const valorTruncado = truncarTexto(ctx, item.valor, boxW - 28);
-          ctx.fillText(valorTruncado, bx + boxW / 2, by + 74);
-          ctx.restore();
-        });
-
-        // =========================================================================
-        // 4. RODAPÉ COMPACTO COM CHAMADA PARA AÇÃO E REDE SOCIAL (@ongapia.oficial)
-        // (Termina em y = 1640px, deixando 280px livres na base do Story)
-        // =========================================================================
-        const footerTextoY = cardY + cardH + 46; // 1475
-        ctx.save();
-        ctx.textAlign = 'center';
-        ctx.fillStyle = CORES.verdeMenta;
-        ctx.font = '600 26px Inter, Poppins, sans-serif';
-        ctx.fillText(
-          'Quer adotar ou ajudar? Fale conosco nas redes sociais!',
-          STORY_WIDTH / 2,
-          footerTextoY
-        );
-        ctx.restore();
-
-        const ctaX = 140;
-        const ctaY = footerTextoY + 22; // 1497
-        const ctaW = STORY_WIDTH - 280;
-        const ctaH = 132; // Termina em 1629px
-
-        ctx.save();
-        desenharRetanguloArredondado(ctx, ctaX, ctaY, ctaW, ctaH, 34);
-        ctx.fillStyle = 'rgba(255, 255, 255, 0.12)';
-        ctx.fill();
-        ctx.strokeStyle = 'rgba(255, 255, 255, 0.25)';
-        ctx.lineWidth = 2;
-        ctx.stroke();
-
-        ctx.textAlign = 'center';
-        ctx.fillStyle = CORES.branco;
-        ctx.font = '800 35px Inter, Poppins, sans-serif';
-        ctx.fillText('📸 @ongapia.oficial', STORY_WIDTH / 2, ctaY + 56);
-
-        ctx.fillStyle = CORES.verdeMenta;
-        ctx.font = '700 26px Inter, Poppins, sans-serif';
-        ctx.fillText('WhatsApp: (54) 99654-6910', STORY_WIDTH / 2, ctaY + 102);
-        ctx.restore();
-
-        // =========================================================================
-        // 5. EXPORTAÇÃO PNG E DOWNLOAD AUTOMÁTICO
-        // =========================================================================
-        const blob = await new Promise((resolve, reject) => {
-          canvas.toBlob((b) => {
-            if (b) resolve(b);
-            else reject(new Error('Não foi possível exportar a imagem do Story.'));
-          }, 'image/png');
-        });
-
-        const dataUrl = canvas.toDataURL('image/png');
-        setStoryPreviewUrl(dataUrl);
+        const blobEscolhido = formato === 'feed' ? blobFeed : blobStory;
+        const dataUrlEscolhida = formato === 'feed' ? dataUrlFeed : dataUrlStory;
 
         if (baixarAutomaticamente) {
-          dispararDownloadBlob(blob, pet.name);
+          dispararDownloadBlob(blobEscolhido, pet.name, formato);
         }
 
-        return { blob, dataUrl };
+        return {
+          blob: blobEscolhido,
+          dataUrl: dataUrlEscolhida,
+          story: { blob: blobStory, dataUrl: dataUrlStory },
+          feed: { blob: blobFeed, dataUrl: dataUrlFeed },
+        };
       } catch (erro) {
-        console.error('Erro ao gerar Story do pet:', erro);
-        setErroStory(erro.message || 'Não foi possível gerar a imagem para o Story.');
+        console.error('Erro ao gerar imagem do pet:', erro);
+        setErroStory(erro.message || 'Não foi possível gerar a imagem do pet.');
         return null;
       } finally {
         setGerandoStory(false);
@@ -418,6 +642,7 @@ export function useStoryGenerator() {
     gerarStoryPet,
     gerandoStory,
     storyPreviewUrl,
+    feedPreviewUrl,
     erroStory,
   };
 }

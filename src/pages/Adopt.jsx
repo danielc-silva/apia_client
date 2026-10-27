@@ -37,7 +37,6 @@ export const Adopt = () => {
         species: especie,
         size: porte,
         gender: sexo,
-        search: termoBusca,
         status: 'disponivel',
       };
       const [disponiveis, adotados] = await Promise.all([
@@ -71,10 +70,15 @@ export const Adopt = () => {
       species: 'todos',
       size: 'todos',
       gender: 'todos',
-      search: '',
       status: 'disponivel',
     });
   };
+
+  const animaisFiltrados = animais.filter((pet) => {
+    const termo = termoBusca.trim().toLowerCase();
+    if (!termo) return true;
+    return pet.name?.toLowerCase().includes(termo);
+  });
 
   return (
     <div className="d-flex flex-column">
@@ -112,7 +116,19 @@ export const Adopt = () => {
           <Card className="border-0 shadow-sm rounded-4 p-4" style={{ backgroundColor: '#f8f9fa' }}>
             <Form onSubmit={aoSubmeterBusca}>
               <Row className="g-3 align-items-end">
-                <Col sm={6} md={3}>
+                <Col xs={12} md={3}>
+                  <Form.Label className="small fw-semibold mb-1">Buscar por nome</Form.Label>
+                  <Form.Control
+                    size="sm"
+                    type="text"
+                    placeholder="Ex.: Thor, Mel..."
+                    value={termoBusca}
+                    onChange={(e) => setTermoBusca(e.target.value)}
+                    className="bg-white py-2"
+                  />
+                </Col>
+
+                <Col sm={4} md={2}>
                   <Form.Label className="small fw-semibold mb-1">Espécie</Form.Label>
                   <Form.Select
                     size="sm"
@@ -126,7 +142,7 @@ export const Adopt = () => {
                   </Form.Select>
                 </Col>
 
-                <Col sm={6} md={3}>
+                <Col sm={4} md={2}>
                   <Form.Label className="small fw-semibold mb-1">Porte</Form.Label>
                   <Form.Select
                     size="sm"
@@ -141,7 +157,7 @@ export const Adopt = () => {
                   </Form.Select>
                 </Col>
 
-                <Col sm={6} md={3}>
+                <Col sm={4} md={2}>
                   <Form.Label className="small fw-semibold mb-1">Sexo</Form.Label>
                   <Form.Select
                     size="sm"
@@ -155,7 +171,7 @@ export const Adopt = () => {
                   </Form.Select>
                 </Col>
 
-                <Col sm={6} md={3}>
+                <Col xs={12} md={3}>
                   <div className="d-flex gap-2">
                     <Button
                       type="submit"
@@ -187,7 +203,8 @@ export const Adopt = () => {
           <div className="d-flex align-items-center justify-content-between mb-4">
             <h2 className="h5 fw-bold text-apia-dark mb-0">Animais para Adoção</h2>
             <span className="small text-muted fw-medium">
-              {animais.length} {animais.length === 1 ? 'animal disponível' : 'animais disponíveis'}
+              {animaisFiltrados.length}{' '}
+              {animaisFiltrados.length === 1 ? 'animal disponível' : 'animais disponíveis'}
             </span>
           </div>
 
@@ -202,12 +219,12 @@ export const Adopt = () => {
                 Tentar novamente
               </Button>
             </Alert>
-          ) : animais.length === 0 ? (
+          ) : animaisFiltrados.length === 0 ? (
             <Card className="border-0 shadow-sm rounded-4 p-5 text-center mx-auto" style={{ maxWidth: '480px' }}>
               <Card.Body>
                 <PawPrint size={36} className="text-success mb-2" />
                 <h5 className="fw-bold fs-6 text-apia-dark mb-1">
-                  Todos os animaizinhos encontraram um lar
+                  Nenhum animal encontrado
                 </h5>
                 <p className="small text-muted mb-3">
                   No momento não há animais disponíveis para adoção com esses critérios.
@@ -227,7 +244,7 @@ export const Adopt = () => {
             </Card>
           ) : (
             <Row className="g-3">
-              {animais.map((pet) => (
+              {animaisFiltrados.map((pet) => (
                 <Col key={pet.id} sm={6} md={4} lg={3}>
                   <PetCard
                     pet={pet}
