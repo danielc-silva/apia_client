@@ -52,10 +52,15 @@ export const api = {
   },
 
   async buscarFinaisFelizes() {
-    return buscarLista(
-      `${API_BASE_URL}/animals/finais-felizes`,
-      'Falha ao buscar finais felizes'
-    );
+    try {
+      return await buscarLista(
+        `${API_BASE_URL}/animals/finais-felizes`,
+        'Falha ao buscar finais felizes'
+      );
+    } catch {
+      const adotados = await this.getAnimals({ status: 'adotado', random: 'true' });
+      return [...adotados].sort(() => Math.random() - 0.5).slice(0, 12);
+    }
   },
 
   async getAnimal(id) {
