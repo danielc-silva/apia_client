@@ -107,11 +107,17 @@ body {
   background-color: #ffffff;
 }
 
-.pet-photo-square {
-  aspect-ratio: 4 / 3;
-  max-height: 220px;
+.aspect-square {
+  aspect-ratio: 1 / 1;
   width: 100%;
+}
+
+.pet-photo-square {
+  aspect-ratio: 1 / 1;
+  width: 100%;
+  height: 100%;
   object-fit: cover;
+  display: block;
 }
 
 .line-clamp-2 {

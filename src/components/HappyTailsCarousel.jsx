@@ -186,11 +186,15 @@ export const HappyTailsCarousel = ({
                     style={{ width: `${100 / itensPorPagina}%` }}
                   >
                     <Card className="h-100 border-0 shadow-sm rounded-4 overflow-hidden">
-                      <div className="position-relative bg-light">
+                      <div
+                        className="position-relative bg-light aspect-square overflow-hidden w-100"
+                        style={{ aspectRatio: '1 / 1' }}
+                      >
                         <img
                           src={pet.photoUrl || pet.photo_url}
                           alt={pet.name}
-                          className="card-img-top pet-photo-square"
+                          className="card-img-top pet-photo-square w-100 h-100 object-fit-cover d-block"
+                          style={{ aspectRatio: '1 / 1' }}
                           loading="lazy"
                           decoding="async"
                         />

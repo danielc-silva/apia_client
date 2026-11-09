@@ -17,13 +17,17 @@ export const PetCard = ({ pet, onAdoptClick, onShareClick }) => {
 
   return (
     <Card className="h-100 shadow-sm border-0 rounded-4 overflow-hidden">
-      <div className="position-relative bg-light">
-        <Card.Img
-          variant="top"
-          src={pet.photoUrl}
+      <div
+        className="position-relative bg-light aspect-square overflow-hidden w-100"
+        style={{ aspectRatio: '1 / 1' }}
+      >
+        <img
+          src={pet.photoUrl || pet.photo_url}
           alt={pet.name}
-          className="pet-photo-square"
+          className="card-img-top pet-photo-square w-100 h-100 object-fit-cover d-block"
+          style={{ aspectRatio: '1 / 1' }}
           loading="lazy"
+          decoding="async"
         />
         {estaAdotado && (
           <Badge
