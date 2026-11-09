@@ -257,7 +257,7 @@ function desenharCanvasStory(pet, imgPet, imgLogo) {
   ctx.textBaseline = 'middle';
   ctx.fillStyle = CORES.branco;
   ctx.font = '800 36px Inter, Poppins, sans-serif';
-  ctx.fillText('🐾 ADOTE UM AMIGO! 🐾', STORY_WIDTH / 2, bannerY + 40);
+  ctx.fillText('ADOTE UM AMIGO!', STORY_WIDTH / 2, bannerY + 40);
   ctx.restore();
 
   // 3. CARD CENTRAL BRANCO
@@ -461,7 +461,7 @@ function desenharCanvasFeed(pet, imgPet, imgLogo) {
   ctx.textBaseline = 'middle';
   ctx.fillStyle = CORES.branco;
   ctx.font = '800 26px Inter, Poppins, sans-serif';
-  ctx.fillText('🐾 ADOTE UM AMIGO!', 820, topY + 46);
+  ctx.fillText('ADOTE UM AMIGO!', 820, topY + 46);
   ctx.restore();
 
   // 3. CARD CENTRAL BRANCO DO PET

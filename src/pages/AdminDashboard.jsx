@@ -77,6 +77,7 @@ export const AdminDashboard = () => {
 
   const [modalEventoAberto, setModalEventoAberto] = useState(false);
   const [idEventoEdicao, setIdEventoEdicao] = useState(null);
+  const [isSubmitting, setIsSubmitting] = useState(false);
   const [formularioEvento, setFormularioEvento] = useState({
     title: '',
     description: '',
@@ -192,6 +193,9 @@ export const AdminDashboard = () => {
 
   const salvarAnimal = async (e) => {
     e.preventDefault();
+    if (isSubmitting) return;
+
+    setIsSubmitting(true);
     try {
       const dadosFormulario = new FormData();
       dadosFormulario.append('name', formularioPet.name);
@@ -224,6 +228,8 @@ export const AdminDashboard = () => {
       carregarAnimais();
     } catch (erro) {
       exibirNotificacao(erro.message || 'Erro ao salvar pet', 'error');
+    } finally {
+      setIsSubmitting(false);
     }
   };
 
@@ -281,6 +287,9 @@ export const AdminDashboard = () => {
 
   const salvarEvento = async (e) => {
     e.preventDefault();
+    if (isSubmitting) return;
+
+    setIsSubmitting(true);
     try {
       const dadosFormulario = new FormData();
       dadosFormulario.append('title', formularioEvento.title);
@@ -305,6 +314,8 @@ export const AdminDashboard = () => {
       carregarEventos();
     } catch (erro) {
       exibirNotificacao(erro.message || 'Erro ao salvar evento', 'error');
+    } finally {
+      setIsSubmitting(false);
     }
   };
 
@@ -867,11 +878,22 @@ export const AdminDashboard = () => {
           </Modal.Body>
 
           <Modal.Footer className="bg-light">
-            <Button variant="outline-secondary" size="sm" onClick={() => setModalPetAberto(false)}>
+            <Button
+              variant="outline-secondary"
+              size="sm"
+              disabled={isSubmitting}
+              onClick={() => setModalPetAberto(false)}
+            >
               Cancelar
             </Button>
-            <Button type="submit" size="sm" className="btn-apia-orange px-4">
-              Salvar Animal
+            <Button
+              type="submit"
+              size="sm"
+              disabled={isSubmitting}
+              className={`btn-apia-orange px-4 ${isSubmitting ? 'opacity-50 cursor-not-allowed' : ''}`}
+              style={isSubmitting ? { cursor: 'not-allowed', pointerEvents: 'auto' } : undefined}
+            >
+              {isSubmitting ? 'Salvando...' : 'Salvar Animal'}
             </Button>
           </Modal.Footer>
         </Form>
@@ -1003,11 +1025,22 @@ export const AdminDashboard = () => {
           </Modal.Body>
 
           <Modal.Footer className="bg-light">
-            <Button variant="outline-secondary" size="sm" onClick={() => setModalEventoAberto(false)}>
+            <Button
+              variant="outline-secondary"
+              size="sm"
+              disabled={isSubmitting}
+              onClick={() => setModalEventoAberto(false)}
+            >
               Cancelar
             </Button>
-            <Button type="submit" size="sm" className="btn-apia-orange px-4">
-              Salvar Evento
+            <Button
+              type="submit"
+              size="sm"
+              disabled={isSubmitting}
+              className={`btn-apia-orange px-4 ${isSubmitting ? 'opacity-50 cursor-not-allowed' : ''}`}
+              style={isSubmitting ? { cursor: 'not-allowed', pointerEvents: 'auto' } : undefined}
+            >
+              {isSubmitting ? 'Salvando...' : 'Salvar Evento'}
             </Button>
           </Modal.Footer>
         </Form>

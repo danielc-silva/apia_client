@@ -58,6 +58,20 @@ body {
   color: #ffffff !important;
 }
 
+.btn-apia-orange:disabled,
+.btn-apia-orange.disabled {
+  background-color: var(--apia-orange) !important;
+  border-color: var(--apia-orange) !important;
+  color: #ffffff !important;
+  opacity: 0.6;
+  cursor: not-allowed !important;
+  pointer-events: auto !important;
+}
+
+.cursor-not-allowed {
+  cursor: not-allowed !important;
+}
+
 .btn-apia-dark {
   background-color: var(--apia-dark);
   border-color: var(--apia-dark);
