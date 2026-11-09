@@ -51,6 +51,13 @@ export const api = {
     return this.getAnimals(filtros);
   },
 
+  async buscarFinaisFelizes() {
+    return buscarLista(
+      `${API_BASE_URL}/animals/finais-felizes`,
+      'Falha ao buscar finais felizes'
+    );
+  },
+
   async getAnimal(id) {
     const res = await fetch(`${API_BASE_URL}/animals/${id}`);
     if (!res.ok) throw new Error('Animal não encontrado');

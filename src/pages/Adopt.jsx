@@ -16,7 +16,6 @@ import { HappyTailsCarousel } from '../components/HappyTailsCarousel.jsx';
 
 export const Adopt = () => {
   const [animais, setAnimais] = useState([]);
-  const [finaisFelizes, setFinaisFelizes] = useState([]);
   const [carregando, setCarregando] = useState(true);
   const [erroCarregamento, setErroCarregamento] = useState('');
 
@@ -38,12 +37,8 @@ export const Adopt = () => {
         gender: sexo,
         status: 'disponivel',
       };
-      const [disponiveis, adotados] = await Promise.all([
-        api.buscarAnimais(criterio),
-        api.buscarAnimais({ status: 'adotado' }),
-      ]);
+      const disponiveis = await api.buscarAnimais(criterio);
       setAnimais(disponiveis);
-      setFinaisFelizes(adotados);
     } catch (erro) {
       setErroCarregamento(erro.message || 'Não foi possível carregar os animais.');
     } finally {
@@ -258,7 +253,7 @@ export const Adopt = () => {
       </section>
 
       {/* 4. Carrossel de Finais Felizes */}
-      <HappyTailsCarousel pets={finaisFelizes} />
+      <HappyTailsCarousel />
 
       {/* Modais */}
       <AdoptionModal

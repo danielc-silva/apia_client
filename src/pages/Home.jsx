@@ -16,7 +16,6 @@ import { HappyTailsCarousel } from '../components/HappyTailsCarousel.jsx';
 
 export const Home = () => {
   const [animaisDisponiveis, setAnimaisDisponiveis] = useState([]);
-  const [animaisAdotados, setAnimaisAdotados] = useState([]);
   const [carregando, setCarregando] = useState(true);
   const [erroCarregamento, setErroCarregamento] = useState('');
 
@@ -27,12 +26,8 @@ export const Home = () => {
     try {
       setCarregando(true);
       setErroCarregamento('');
-      const [disponiveis, adotados] = await Promise.all([
-        api.buscarAnimais({ status: 'disponivel' }),
-        api.buscarAnimais({ status: 'adotado' }),
-      ]);
+      const disponiveis = await api.buscarAnimais({ status: 'disponivel' });
       setAnimaisDisponiveis(disponiveis.slice(0, 4));
-      setAnimaisAdotados(adotados);
     } catch (erro) {
       setErroCarregamento(erro.message || 'Não foi possível carregar os animais.');
     } finally {
@@ -226,7 +221,7 @@ export const Home = () => {
       </section>
 
       {/* 4. Carrossel de Finais Felizes */}
-      <HappyTailsCarousel pets={animaisAdotados} />
+      <HappyTailsCarousel />
 
       {/* 5. Projeto de Extensão IFSUL */}
       <section className="py-5">

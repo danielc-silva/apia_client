@@ -2,17 +2,52 @@ import { useState, useEffect, useRef } from 'react';
 import Container from 'react-bootstrap/Container';
 import Card from 'react-bootstrap/Card';
 import Button from 'react-bootstrap/Button';
-import { ChevronLeft, ChevronRight, Heart, Sparkles, PawPrint } from 'lucide-react';
+import { ChevronLeft, ChevronRight, PawPrint } from 'lucide-react';
+import { api } from '../services/api.js';
 
 export const HappyTailsCarousel = ({
-  pets = [],
+  pets: petsProp,
   title = 'Finais Felizes',
   subtitle = 'Graças ao apoio da nossa comunidade, esses animais foram adotados e hoje vivem com segurança e dignidade.',
 }) => {
+  const [petsInternos, setPetsInternos] = useState([]);
+  const [carregando, setCarregando] = useState(petsProp === undefined);
   const [indiceAtual, setIndiceAtual] = useState(0);
   const [itensPorPagina, setItensPorPagina] = useState(4);
   const [pausadoPeloMouse, setPausadoPeloMouse] = useState(false);
   const toqueInicialX = useRef(null);
+
+  const pets = petsProp !== undefined ? petsProp : petsInternos;
+
+  useEffect(() => {
+    if (petsProp !== undefined) {
+      setCarregando(false);
+      return;
+    }
+
+    let cancelado = false;
+
+    const carregarFinaisFelizes = async () => {
+      try {
+        setCarregando(true);
+        const dados = await api.buscarFinaisFelizes();
+        if (!cancelado) {
+          setPetsInternos(dados);
+        }
+      } catch (erro) {
+        console.error('[HappyTailsCarousel] Erro ao buscar finais felizes:', erro);
+      } finally {
+        if (!cancelado) {
+          setCarregando(false);
+        }
+      }
+    };
+
+    carregarFinaisFelizes();
+    return () => {
+      cancelado = true;
+    };
+  }, [petsProp]);
 
   useEffect(() => {
     const ajustarItensPorTela = () => {
@@ -112,7 +147,11 @@ export const HappyTailsCarousel = ({
           )}
         </div>
 
-        {!pets || pets.length === 0 ? (
+        {carregando ? (
+          <div className="text-center py-5 text-muted fw-semibold">
+            Carregando finais felizes...
+          </div>
+        ) : !pets || pets.length === 0 ? (
           <Card className="border-0 shadow-sm rounded-4 p-5 text-center mx-auto" style={{ maxWidth: '480px' }}>
             <Card.Body>
               <PawPrint size={34} className="text-muted mb-2 opacity-75" />
@@ -148,20 +187,22 @@ export const HappyTailsCarousel = ({
                   >
                     <Card className="h-100 border-0 shadow-sm rounded-4 overflow-hidden">
                       <div className="position-relative bg-light">
-                        <Card.Img
-                          variant="top"
-                          src={pet.photoUrl}
+                        <img
+                          src={pet.photoUrl || pet.photo_url}
                           alt={pet.name}
-                          className="pet-photo-square"
+                          className="card-img-top pet-photo-square"
                           loading="lazy"
+                          decoding="async"
                         />
                       </div>
                       <Card.Body className="p-3 text-center">
                         <h6 className="fw-bold text-apia-dark mb-1">{pet.name}</h6>
-                        <small className="text-muted">
-                          {pet.species === 'cachorro' ? 'Cachorro' : 'Gato'}
-                          {pet.breed ? ` • ${pet.breed}` : ''}
-                        </small>
+                        {(pet.species || pet.breed) && (
+                          <small className="text-muted">
+                            {pet.species ? (pet.species === 'cachorro' ? 'Cachorro' : 'Gato') : ''}
+                            {pet.species && pet.breed ? ` • ${pet.breed}` : pet.breed || ''}
+                          </small>
+                        )}
                       </Card.Body>
                     </Card>
                   </div>
