@@ -199,10 +199,10 @@ export const HappyTailsCarousel = ({
                           decoding="async"
                         />
                       </div>
-                      <Card.Body className="p-3 text-center">
-                        <h6 className="fw-bold text-apia-dark mb-1">{pet.name}</h6>
+                      <Card.Body className="p-2 py-2 text-center">
+                        <h6 className="fw-bold text-apia-dark mb-0" style={{ fontSize: '1.05rem' }}>{pet.name}</h6>
                         {(pet.species || pet.breed) && (
-                          <small className="text-muted">
+                          <small className="text-muted" style={{ fontSize: '0.78rem' }}>
                             {pet.species ? (pet.species === 'cachorro' ? 'Cachorro' : 'Gato') : ''}
                             {pet.species && pet.breed ? ` • ${pet.breed}` : pet.breed || ''}
                           </small>

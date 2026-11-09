@@ -32,37 +32,40 @@ export const PetCard = ({ pet, onAdoptClick, onShareClick }) => {
         {estaAdotado && (
           <Badge
             bg="success"
-            className="position-absolute top-0 start-0 m-3 px-3 py-2 rounded-pill d-inline-flex align-items-center gap-1 shadow-sm"
+            className="position-absolute top-0 start-0 m-2 px-2 py-1 rounded-pill d-inline-flex align-items-center gap-1 shadow-sm"
+            style={{ fontSize: '0.75rem' }}
           >
-            <Sparkles size={13} />
+            <Sparkles size={12} />
             Adotado
           </Badge>
         )}
       </div>
 
-      <Card.Body className="d-flex flex-column justify-content-between p-3">
+      <Card.Body className="d-flex flex-column justify-content-between p-2 px-3">
         <div>
           <div className="d-flex align-items-baseline justify-content-between gap-2">
-            <Card.Title className="fw-bold text-apia-dark mb-0 fs-5">{pet.name}</Card.Title>
-            <span className="text-muted small fw-medium">
+            <Card.Title className="fw-bold text-apia-dark mb-0" style={{ fontSize: '1.12rem' }}>
+              {pet.name}
+            </Card.Title>
+            <span className="text-muted fw-medium" style={{ fontSize: '0.78rem' }}>
               {rotuloEspecie} • {rotuloSexo}
             </span>
           </div>
 
-          <p className="text-muted small mb-2 mt-1">
+          <p className="text-muted mb-1 mt-1" style={{ fontSize: '0.8rem' }}>
             {rotuloPorte} • {pet.age}
           </p>
 
-          <div className="d-flex flex-wrap align-items-center gap-2 mb-2 small text-success fw-semibold">
+          <div className="d-flex flex-wrap align-items-center gap-1 mb-2 text-success fw-semibold" style={{ fontSize: '0.78rem' }}>
             {pet.isCastrated && (
               <span className="d-inline-flex align-items-center gap-1">
-                <Check size={14} /> Castrado
+                <Check size={13} /> Castrado
               </span>
             )}
             {pet.isCastrated && pet.isVaccinated && <span>•</span>}
             {pet.isVaccinated && (
               <span className="d-inline-flex align-items-center gap-1">
-                <Check size={14} /> Vacinado
+                <Check size={13} /> Vacinado
               </span>
             )}
             {pet.breed && pet.breed !== 'SRD' && pet.breed !== 'SRD (Sem Raça Definida)' && (
@@ -73,14 +76,14 @@ export const PetCard = ({ pet, onAdoptClick, onShareClick }) => {
             )}
           </div>
 
-          <Card.Text className="small text-secondary line-clamp-2 mb-3">
+          <Card.Text className="text-secondary line-clamp-2 mb-2" style={{ fontSize: '0.82rem', lineHeight: '1.38' }}>
             {pet.temperament || pet.description || 'Amoroso, sociável e à espera de um lar com carinho.'}
           </Card.Text>
         </div>
 
         <div className="d-flex align-items-center gap-2 pt-2 border-top">
           {estaAdotado ? (
-            <div className="w-100 text-center py-2 rounded-3 bg-light text-muted small fw-semibold">
+            <div className="w-100 text-center py-1 rounded-3 bg-light text-muted fw-semibold" style={{ fontSize: '0.8rem' }}>
               🐾 Final Feliz! Já tem um lar
             </div>
           ) : (
@@ -88,7 +91,7 @@ export const PetCard = ({ pet, onAdoptClick, onShareClick }) => {
               <Button
                 variant="success"
                 onClick={() => onAdoptClick(pet)}
-                className="btn-apia-dark flex-grow-1 py-2 rounded-3 small fw-semibold"
+                className="btn-apia-dark flex-grow-1 py-1 px-2 rounded-3 small fw-semibold"
               >
                 Quero adotar
               </Button>
@@ -96,9 +99,9 @@ export const PetCard = ({ pet, onAdoptClick, onShareClick }) => {
                 variant="outline-secondary"
                 onClick={() => onShareClick(pet)}
                 title="Compartilhar"
-                className="py-2 px-3 rounded-3 d-inline-flex align-items-center justify-content-center"
+                className="py-1 px-2 rounded-3 d-inline-flex align-items-center justify-content-center"
               >
-                <Share2 size={16} />
+                <Share2 size={15} />
               </Button>
             </>
           )}
