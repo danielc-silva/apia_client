@@ -13,8 +13,10 @@ import Modal from 'react-bootstrap/Modal';
 import Nav from 'react-bootstrap/Nav';
 import {
   PawPrint,
+  Heart,
   Calendar,
   Plus,
+  ImagePlus,
   Trash2,
   Edit,
   CheckCircle,
@@ -28,9 +30,21 @@ import {
   Share2,
 } from 'lucide-react';
 import { api } from '../services/api.js';
+import { obterIcone, OPCOES_ICONES, ROTULOS_ICONES } from '../utils/icones.js';
+import { reduzirImagem } from '../utils/imagens.js';
 import { ImageCropperModal } from '../components/ImageCropperModal.jsx';
 import { SharePetModal } from '../components/SharePetModal.jsx';
 import { ShareEventModal } from '../components/ShareEventModal.jsx';
+
+const FORMULARIO_CARD_VAZIO = {
+  title: '',
+  description: '',
+  icon: 'Heart',
+  linkLabel: '',
+  linkUrl: '',
+  sortOrder: 1,
+  isVisible: true,
+};
 
 export const AdminDashboard = () => {
   const navigate = useNavigate();
@@ -45,6 +59,16 @@ export const AdminDashboard = () => {
   const [eventos, setEventos] = useState([]);
   const [carregandoEventos, setCarregandoEventos] = useState(false);
   const [erroEventos, setErroEventos] = useState('');
+
+  const [cardsAjuda, setCardsAjuda] = useState([]);
+  const [carregandoCards, setCarregandoCards] = useState(false);
+  const [erroCards, setErroCards] = useState('');
+  const [modalCardAberto, setModalCardAberto] = useState(false);
+  const [idCardEdicao, setIdCardEdicao] = useState(null);
+  const [formularioCard, setFormularioCard] = useState(FORMULARIO_CARD_VAZIO);
+  const [imagensPasso, setImagensPasso] = useState([]);
+  const [carregandoImagens, setCarregandoImagens] = useState(false);
+  const [enviandoImagens, setEnviandoImagens] = useState(false);
 
   const [notificacao, setNotificacao] = useState(null);
   const [petCompartilhar, setPetCompartilhar] = useState(null);
@@ -118,9 +142,23 @@ export const AdminDashboard = () => {
     }
   };
 
+  const carregarCardsAjuda = async () => {
+    try {
+      setCarregandoCards(true);
+      const dados = await api.buscarCardsAjuda(true);
+      setCardsAjuda(dados);
+      setErroCards('');
+    } catch (erro) {
+      setErroCards(erro.message || 'Não foi possível carregar os cards.');
+    } finally {
+      setCarregandoCards(false);
+    }
+  };
+
   useEffect(() => {
     carregarAnimais();
     carregarEventos();
+    carregarCardsAjuda();
   }, []);
 
   const exibirNotificacao = (mensagem, tipo = 'success') => {
@@ -341,6 +379,137 @@ export const AdminDashboard = () => {
     }
   };
 
+  const abrirModalCard = (card) => {
+    if (card) {
+      setIdCardEdicao(card.id);
+      setFormularioCard({
+        title: card.title,
+        description: card.description,
+        icon: card.icon || 'Heart',
+        linkLabel: card.linkLabel || '',
+        linkUrl: card.linkUrl || '',
+        sortOrder: card.sortOrder,
+        isVisible: card.isVisible,
+      });
+      setImagensPasso([]);
+      carregarImagensPasso(card.id);
+    } else {
+      setIdCardEdicao(null);
+      const proximaOrdem = Math.max(0, ...cardsAjuda.map((c) => c.sortOrder)) + 1;
+      setFormularioCard({ ...FORMULARIO_CARD_VAZIO, sortOrder: proximaOrdem });
+      setImagensPasso([]);
+    }
+    setModalCardAberto(true);
+  };
+
+  const salvarCard = async (e) => {
+    e.preventDefault();
+    if (isSubmitting) return;
+
+    setIsSubmitting(true);
+    try {
+      const dados = {
+        title: formularioCard.title.trim(),
+        description: formularioCard.description.trim(),
+        icon: formularioCard.icon,
+        linkLabel: formularioCard.linkLabel.trim(),
+        linkUrl: formularioCard.linkUrl.trim(),
+        sortOrder: Number(formularioCard.sortOrder) || 0,
+        isVisible: formularioCard.isVisible,
+      };
+      if (idCardEdicao) {
+        await api.atualizarCardAjuda(idCardEdicao, dados);
+        exibirNotificacao('Card atualizado com sucesso!');
+      } else {
+        await api.cadastrarCardAjuda(dados);
+        exibirNotificacao('Novo card criado com sucesso!');
+      }
+      setModalCardAberto(false);
+      carregarCardsAjuda();
+    } catch (erro) {
+      exibirNotificacao(erro.message || 'Erro ao salvar card', 'error');
+    } finally {
+      setIsSubmitting(false);
+    }
+  };
+
+  const alternarVisibilidadeCard = async (card) => {
+    try {
+      await api.alternarVisibilidadeCardAjuda(card.id);
+      exibirNotificacao(`Visibilidade de "${card.title}" atualizada.`);
+      carregarCardsAjuda();
+    } catch (erro) {
+      exibirNotificacao(erro.message || 'Erro ao alterar visibilidade', 'error');
+    }
+  };
+
+  const excluirCard = async (card) => {
+    if (window.confirm(`Deseja realmente excluir o card "${card.title}"?`)) {
+      try {
+        await api.excluirCardAjuda(card.id);
+        exibirNotificacao('Card removido com sucesso.');
+        carregarCardsAjuda();
+      } catch (erro) {
+        exibirNotificacao(erro.message || 'Erro ao excluir card', 'error');
+      }
+    }
+  };
+
+  const carregarImagensPasso = async (idCard) => {
+    try {
+      setCarregandoImagens(true);
+      const dados = await api.buscarImagensCardAjuda(idCard, true);
+      setImagensPasso(dados);
+    } catch (erro) {
+      exibirNotificacao(erro.message || 'Erro ao carregar as imagens.', 'error');
+    } finally {
+      setCarregandoImagens(false);
+    }
+  };
+
+  const adicionarImagensPasso = async (e) => {
+    const arquivos = Array.from(e.target.files || []);
+    e.target.value = '';
+    if (!idCardEdicao || arquivos.length === 0) return;
+
+    setEnviandoImagens(true);
+    try {
+      for (const arquivo of arquivos) {
+        const blob = await reduzirImagem(arquivo);
+        const dados = new FormData();
+        dados.append('photo', blob, 'passo.jpg');
+        await api.cadastrarImagemCardAjuda(idCardEdicao, dados);
+      }
+      exibirNotificacao('Imagem(ns) adicionada(s) com sucesso!');
+    } catch (erro) {
+      exibirNotificacao(erro.message || 'Erro ao enviar imagem', 'error');
+    } finally {
+      setEnviandoImagens(false);
+      await carregarImagensPasso(idCardEdicao);
+      carregarCardsAjuda();
+    }
+  };
+
+  const atualizarImagemPasso = async (img, campos) => {
+    try {
+      await api.atualizarImagemCardAjuda(idCardEdicao, img.id, campos);
+      await carregarImagensPasso(idCardEdicao);
+    } catch (erro) {
+      exibirNotificacao(erro.message || 'Erro ao atualizar imagem', 'error');
+    }
+  };
+
+  const excluirImagemPasso = async (img) => {
+    if (!window.confirm('Remover esta imagem do passo a passo?')) return;
+    try {
+      await api.excluirImagemCardAjuda(idCardEdicao, img.id);
+      await carregarImagensPasso(idCardEdicao);
+      carregarCardsAjuda();
+    } catch (erro) {
+      exibirNotificacao(erro.message || 'Erro ao excluir imagem', 'error');
+    }
+  };
+
   const animaisFiltrados = animais.filter((a) => {
     if (filtroAnimais !== 'todos' && a.status !== filtroAnimais) return false;
     if (!buscaAnimais) return true;
@@ -368,7 +537,7 @@ export const AdminDashboard = () => {
                 Painel Administrativo da APIA
               </h1>
               <p className="small text-muted mb-0">
-                Gerencie animais para adoção, finais felizes e eventos (otimizado para celular).
+                Gerencie animais para adoção, finais felizes e eventos.
               </p>
             </div>
           </div>
@@ -455,6 +624,16 @@ export const AdminDashboard = () => {
           >
             <Calendar size={16} />
             Gerenciar Eventos e Notícias ({eventos.length})
+          </Nav.Link>
+        </Nav.Item>
+        <Nav.Item>
+          <Nav.Link
+            active={abaAtiva === 'helpCards'}
+            onClick={() => setAbaAtiva('helpCards')}
+            className="fw-bold small d-inline-flex align-items-center gap-2 text-apia-dark"
+          >
+            <Heart size={16} />
+            Gerenciar Como Ajudar ({cardsAjuda.length})
           </Nav.Link>
         </Nav.Item>
       </Nav>
@@ -692,6 +871,94 @@ export const AdminDashboard = () => {
                     </div>
                   </div>
                 ))}
+              </div>
+            )}
+          </Card>
+        </div>
+      )}
+
+      {/* ABA 3: GERENCIAR COMO AJUDAR */}
+      {abaAtiva === 'helpCards' && (
+        <div>
+          <div className="d-flex flex-column flex-sm-row align-items-sm-center justify-content-between gap-2 mb-3">
+            <p className="small text-muted mb-0">
+              Gerencie os cards da página "Como Ajudar" (ex.: Nota Fiscal Gaúcha, Bazar). Menor ordem aparece primeiro.
+            </p>
+            <Button
+              onClick={() => abrirModalCard()}
+              className="btn-apia-orange btn-sm px-4 py-2 rounded-3 d-inline-flex align-items-center gap-2"
+            >
+              <Plus size={16} />
+              Novo Card
+            </Button>
+          </div>
+
+          <Card className="border-0 shadow-sm rounded-4 overflow-hidden">
+            {carregandoCards ? (
+              <div className="p-5 text-center text-muted fw-semibold">Carregando cards...</div>
+            ) : erroCards ? (
+              <Alert variant="danger" className="m-3">
+                <p className="mb-3">Não foi possível carregar os cards: {erroCards}</p>
+                <Button variant="outline-danger" size="sm" onClick={carregarCardsAjuda}>
+                  Tentar novamente
+                </Button>
+              </Alert>
+            ) : cardsAjuda.length === 0 ? (
+              <div className="p-5 text-center text-muted">
+                <Heart size={32} className="mb-2 opacity-50" />
+                <div className="small fw-semibold">Nenhum card cadastrado ainda.</div>
+              </div>
+            ) : (
+              <div className="list-group list-group-flush">
+                {cardsAjuda.map((card) => {
+                  const Icone = obterIcone(card.icon);
+                  return (
+                    <div
+                      key={card.id}
+                      className="list-group-item p-3 p-sm-4 d-flex flex-column flex-sm-row align-items-start align-items-sm-center justify-content-between gap-3"
+                    >
+                      <div className="d-flex align-items-start gap-3">
+                        <div
+                          className="rounded-3 bg-apia-light text-apia-dark d-flex align-items-center justify-content-center flex-shrink-0"
+                          style={{ width: '42px', height: '42px' }}
+                        >
+                          <Icone size={20} />
+                        </div>
+                        <div>
+                          <div className="d-flex align-items-center gap-2 mb-1">
+                            <h6 className="fw-bold text-apia-dark mb-0">{card.title}</h6>
+                            <Badge bg={card.isVisible ? 'success' : 'secondary'}>
+                              {card.isVisible ? 'Visível' : 'Oculto'}
+                            </Badge>
+                            {card.stepsCount > 0 && <Badge bg="info">Passo a passo ({card.stepsCount})</Badge>}
+                          </div>
+                          <p className="small text-muted mb-1 line-clamp-2" style={{ maxWidth: '580px' }}>
+                            {card.description}
+                          </p>
+                          <small className="text-secondary">Ordem: {card.sortOrder}</small>
+                        </div>
+                      </div>
+
+                      <div className="d-flex align-items-center gap-2">
+                        <Button
+                          variant="outline-secondary"
+                          size="sm"
+                          onClick={() => alternarVisibilidadeCard(card)}
+                          className="d-inline-flex align-items-center gap-1"
+                        >
+                          {card.isVisible ? <EyeOff size={14} /> : <Eye size={14} />}
+                          {card.isVisible ? 'Ocultar' : 'Exibir'}
+                        </Button>
+                        <Button variant="outline-primary" size="sm" onClick={() => abrirModalCard(card)} title="Editar card">
+                          <Edit size={15} />
+                        </Button>
+                        <Button variant="outline-danger" size="sm" onClick={() => excluirCard(card)} title="Excluir card">
+                          <Trash2 size={15} />
+                        </Button>
+                      </div>
+                    </div>
+                  );
+                })}
               </div>
             )}
           </Card>
@@ -1041,6 +1308,201 @@ export const AdminDashboard = () => {
               style={isSubmitting ? { cursor: 'not-allowed', pointerEvents: 'auto' } : undefined}
             >
               {isSubmitting ? 'Salvando...' : 'Salvar Evento'}
+            </Button>
+          </Modal.Footer>
+        </Form>
+      </Modal>
+
+      {/* MODAL: CADASTRAR / EDITAR CARD DE COMO AJUDAR */}
+      <Modal show={modalCardAberto} onHide={() => setModalCardAberto(false)} centered size="lg">
+        <Modal.Header closeButton closeVariant="white" className="bg-apia-dark text-white border-0">
+          <Modal.Title className="fs-6 fw-bold d-flex align-items-center gap-2">
+            <Heart size={18} color="#DE5A3A" />
+            {idCardEdicao ? 'Editar Card' : 'Cadastrar Novo Card'}
+          </Modal.Title>
+        </Modal.Header>
+
+        <Form onSubmit={salvarCard}>
+          <Modal.Body className="p-4">
+            <Form.Group className="mb-3">
+              <Form.Label className="small fw-bold">Título *</Form.Label>
+              <Form.Control
+                type="text"
+                required
+                maxLength={100}
+                placeholder="Ex: Nota Fiscal Gaúcha"
+                value={formularioCard.title}
+                onChange={(e) => setFormularioCard({ ...formularioCard, title: e.target.value })}
+              />
+            </Form.Group>
+
+            <Form.Group className="mb-3">
+              <Form.Label className="small fw-bold">Descrição *</Form.Label>
+              <Form.Control
+                as="textarea"
+                rows={4}
+                required
+                maxLength={1000}
+                value={formularioCard.description}
+                onChange={(e) => setFormularioCard({ ...formularioCard, description: e.target.value })}
+              />
+            </Form.Group>
+
+            <Form.Group className="mb-3">
+              <Form.Label className="small fw-bold">Ícone</Form.Label>
+              <Form.Select
+                value={formularioCard.icon}
+                onChange={(e) => setFormularioCard({ ...formularioCard, icon: e.target.value })}
+              >
+                {OPCOES_ICONES.map((nome) => (
+                  <option key={nome} value={nome}>{ROTULOS_ICONES[nome]}</option>
+                ))}
+              </Form.Select>
+            </Form.Group>
+
+            <Form.Group className="mb-3">
+              <Form.Label className="small fw-bold">Texto do link</Form.Label>
+              <Form.Control
+                type="text"
+                maxLength={80}
+                required={formularioCard.linkUrl.trim() !== ''}
+                placeholder="Ex: Saiba como doar"
+                value={formularioCard.linkLabel}
+                onChange={(e) => setFormularioCard({ ...formularioCard, linkLabel: e.target.value })}
+              />
+            </Form.Group>
+
+            <Form.Group className="mb-3">
+              <Form.Label className="small fw-bold">Endereço do link (URL)</Form.Label>
+              <Form.Control
+                type="text"
+                placeholder="https://... ou /eventos ou #secao"
+                value={formularioCard.linkUrl}
+                onChange={(e) => setFormularioCard({ ...formularioCard, linkUrl: e.target.value })}
+              />
+              <Form.Text className="text-muted">
+                Deixe em branco para um card sem link. Use /eventos para levar ao mural de notícias. Se o card tiver passo a passo em imagens, este link não é usado.
+              </Form.Text>
+            </Form.Group>
+
+            <Form.Group className="mb-3">
+              <Form.Label className="small fw-bold">Ordem de exibição</Form.Label>
+              <Form.Control
+                type="number"
+                min={0}
+                max={9999}
+                value={formularioCard.sortOrder}
+                onChange={(e) => setFormularioCard({ ...formularioCard, sortOrder: e.target.value })}
+              />
+            </Form.Group>
+
+            <div className="mb-3 p-3 bg-light rounded-3 border">
+              <div className="small fw-bold mb-1">Passo a passo em imagens (carrossel)</div>
+              <p className="small text-muted mb-2">
+                Com imagens cadastradas, o botão do card abre um popup em carrossel e o link acima é ignorado.
+              </p>
+
+              {!idCardEdicao ? (
+                <p className="small text-secondary mb-0">
+                  Salve o card primeiro e depois clique em Editar para adicionar as imagens.
+                </p>
+              ) : (
+                <>
+                  {carregandoImagens ? (
+                    <p className="small text-muted">Carregando imagens...</p>
+                  ) : imagensPasso.length === 0 ? (
+                    <p className="small text-muted">Nenhuma imagem cadastrada.</p>
+                  ) : (
+                    imagensPasso.map((img, i) => (
+                      <div key={img.id} className="d-flex align-items-center gap-2 mb-2">
+                        <img
+                          src={img.imageUrl}
+                          alt={`Passo ${i + 1}`}
+                          style={{ width: '64px', height: '64px', objectFit: 'cover' }}
+                          className="rounded-2 border"
+                        />
+                        <Form.Control
+                          size="sm"
+                          type="number"
+                          min={0}
+                          max={9999}
+                          aria-label="Ordem"
+                          style={{ width: '70px' }}
+                          defaultValue={img.sortOrder}
+                          key={`ordem-${img.id}-${img.sortOrder}`}
+                          onBlur={(e) => {
+                            if (Number(e.target.value) !== img.sortOrder) {
+                              atualizarImagemPasso(img, { sortOrder: Number(e.target.value) });
+                            }
+                          }}
+                        />
+                        <Form.Control
+                          size="sm"
+                          type="text"
+                          maxLength={200}
+                          placeholder="Legenda do passo (opcional)"
+                          defaultValue={img.caption || ''}
+                          key={`legenda-${img.id}-${img.caption}`}
+                          onBlur={(e) => {
+                            if (e.target.value !== (img.caption || '')) {
+                              atualizarImagemPasso(img, { caption: e.target.value });
+                            }
+                          }}
+                        />
+                        <Button
+                          type="button"
+                          variant="outline-danger"
+                          size="sm"
+                          onClick={() => excluirImagemPasso(img)}
+                          title="Remover imagem"
+                        >
+                          <Trash2 size={14} />
+                        </Button>
+                      </div>
+                    ))
+                  )}
+
+                  <Form.Label
+                    className={`btn btn-outline-secondary btn-sm mb-0 d-inline-flex align-items-center gap-2 ${enviandoImagens ? 'disabled' : ''}`}
+                  >
+                    <ImagePlus size={14} />
+                    {enviandoImagens ? 'Enviando...' : 'Adicionar imagens'}
+                    <input
+                      type="file"
+                      accept="image/jpeg,image/png,image/webp"
+                      multiple
+                      hidden
+                      disabled={enviandoImagens}
+                      onChange={adicionarImagensPasso}
+                    />
+                  </Form.Label>
+                  <div className="small text-muted mt-2">Menor número aparece primeiro. Máximo de 20 imagens.</div>
+                </>
+              )}
+            </div>
+
+            <div className="p-2 bg-light rounded-3 border">
+              <Form.Check
+                type="checkbox"
+                id="card-visivel"
+                checked={formularioCard.isVisible}
+                onChange={(e) => setFormularioCard({ ...formularioCard, isVisible: e.target.checked })}
+                label={<span className="small fw-bold">Exibir na página "Como Ajudar"</span>}
+              />
+            </div>
+          </Modal.Body>
+
+          <Modal.Footer className="bg-light">
+            <Button variant="outline-secondary" size="sm" disabled={isSubmitting} onClick={() => setModalCardAberto(false)}>
+              Cancelar
+            </Button>
+            <Button
+              type="submit"
+              size="sm"
+              disabled={isSubmitting}
+              className={`btn-apia-orange px-4 ${isSubmitting ? 'opacity-50' : ''}`}
+            >
+              {isSubmitting ? 'Salvando...' : 'Salvar Card'}
             </Button>
           </Modal.Footer>
         </Form>

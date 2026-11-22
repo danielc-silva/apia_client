@@ -315,3 +315,7 @@ body {
   display: flex;
   align-items: center;
 }
+
+.sede-section {
+  scroll-margin-top: 90px;
+}

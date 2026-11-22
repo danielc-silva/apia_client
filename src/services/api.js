@@ -29,6 +29,21 @@ function obterCabecalhoAutenticacao() {
   return token ? { Authorization: `Bearer ${token}` } : {};
 }
 
+async function enviarJson(url, metodo, dados, mensagemErro) {
+  const res = await fetch(url, {
+    method: metodo,
+    headers: { ...obterCabecalhoAutenticacao(), 'Content-Type': 'application/json' },
+    body: dados === undefined ? undefined : JSON.stringify(dados),
+  });
+  if (!res.ok) {
+    const tipo = res.headers.get('content-type') || '';
+    const err = tipo.includes('application/json') ? await res.json() : null;
+    throw new Error(err?.message || err?.mensagem || mensagemErro);
+  }
+  const json = await res.json();
+  return json.data;
+}
+
 export const api = {
   // ==========================================
   // MÉTODOS DE ANIMAIS
@@ -238,6 +253,97 @@ export const api = {
 
   async excluirEvento(id) {
     return this.deleteEvent(id);
+  },
+
+  // ==========================================
+  // MÉTODOS DE CARDS DE COMO AJUDAR
+  // ==========================================
+  async getHelpCards(all = false) {
+    const url = all ? `${API_BASE_URL}/help-cards/admin` : `${API_BASE_URL}/help-cards`;
+    const headers = all ? obterCabecalhoAutenticacao() : undefined;
+    return buscarLista(url, 'Falha ao buscar cards de ajuda', headers);
+  },
+
+  async buscarCardsAjuda(todos = false) {
+    return this.getHelpCards(todos);
+  },
+
+  async createHelpCard(dados) {
+    return enviarJson(`${API_BASE_URL}/help-cards`, 'POST', dados, 'Erro ao criar card');
+  },
+
+  async cadastrarCardAjuda(dados) {
+    return this.createHelpCard(dados);
+  },
+
+  async updateHelpCard(id, dados) {
+    return enviarJson(`${API_BASE_URL}/help-cards/${id}`, 'PUT', dados, 'Erro ao atualizar card');
+  },
+
+  async atualizarCardAjuda(id, dados) {
+    return this.updateHelpCard(id, dados);
+  },
+
+  async toggleHelpCardVisibility(id) {
+    return enviarJson(`${API_BASE_URL}/help-cards/${id}/toggle`, 'PATCH', undefined, 'Erro ao alterar visibilidade');
+  },
+
+  async alternarVisibilidadeCardAjuda(id) {
+    return this.toggleHelpCardVisibility(id);
+  },
+
+  async deleteHelpCard(id) {
+    return enviarJson(`${API_BASE_URL}/help-cards/${id}`, 'DELETE', undefined, 'Erro ao excluir card');
+  },
+
+  async excluirCardAjuda(id) {
+    return this.deleteHelpCard(id);
+  },
+
+  async getHelpCardImages(id, admin = false) {
+    const url = admin
+      ? `${API_BASE_URL}/help-cards/admin/${id}/images`
+      : `${API_BASE_URL}/help-cards/${id}/images`;
+    const headers = admin ? obterCabecalhoAutenticacao() : undefined;
+    return buscarLista(url, 'Falha ao buscar imagens do passo a passo', headers);
+  },
+
+  async buscarImagensCardAjuda(id, admin = false) {
+    return this.getHelpCardImages(id, admin);
+  },
+
+  async uploadHelpCardImage(id, formData) {
+    const res = await fetch(`${API_BASE_URL}/help-cards/${id}/images`, {
+      method: 'POST',
+      headers: { ...obterCabecalhoAutenticacao() },
+      body: formData,
+    });
+    if (!res.ok) {
+      const err = await res.json();
+      throw new Error(err.message || err.mensagem || 'Erro ao enviar imagem');
+    }
+    const json = await res.json();
+    return json.data;
+  },
+
+  async cadastrarImagemCardAjuda(id, formData) {
+    return this.uploadHelpCardImage(id, formData);
+  },
+
+  async updateHelpCardImage(id, imagemId, dados) {
+    return enviarJson(`${API_BASE_URL}/help-cards/${id}/images/${imagemId}`, 'PUT', dados, 'Erro ao atualizar imagem');
+  },
+
+  async atualizarImagemCardAjuda(id, imagemId, dados) {
+    return this.updateHelpCardImage(id, imagemId, dados);
+  },
+
+  async deleteHelpCardImage(id, imagemId) {
+    return enviarJson(`${API_BASE_URL}/help-cards/${id}/images/${imagemId}`, 'DELETE', undefined, 'Erro ao excluir imagem');
+  },
+
+  async excluirImagemCardAjuda(id, imagemId) {
+    return this.deleteHelpCardImage(id, imagemId);
   },
 
   // ==========================================
