@@ -2,8 +2,23 @@ import Container from 'react-bootstrap/Container';
 import Row from 'react-bootstrap/Row';
 import Col from 'react-bootstrap/Col';
 import Card from 'react-bootstrap/Card';
-import { Heart, GraduationCap, Users, Shield, Mail, Phone, Instagram, Facebook } from 'lucide-react';
+import {
+  Heart, GraduationCap, Users, Shield, Mail, Phone, Instagram, Facebook,
+  MapPin, CalendarCheck, MessageCircle, Home,
+} from 'lucide-react';
 import bannerSobreApia from '../assets/banner-sobre-apia.jpg';
+
+// PREENCHER quando a ONG enviar os dados. Vazio = o item não aparece.
+const SEDE_ENDERECO = '';
+const SEDE_MAPS_URL = '';
+// Quando a foto chegar: salvar em src/assets/sede-apia.jpg, adicionar
+//   import fotoSede from '../assets/sede-apia.jpg';
+// e trocar a linha abaixo por: const FOTO_SEDE = fotoSede;
+const FOTO_SEDE = null;
+
+const WHATSAPP_VISITA = `https://wa.me/5554996546910?text=${encodeURIComponent(
+  'Olá APIA! Gostaria de combinar uma visita à sede.'
+)}`;
 
 export const About = () => {
   return (
@@ -23,6 +38,10 @@ export const About = () => {
               <p className="text-light opacity-75 mb-0">
                 A <strong>APIA — Associação de Protetores Incondicionais dos Animais</strong> é uma entidade voluntária e sem fins lucrativos dedicada ao acolhimento, cuidado e proteção de animais abandonados em Lagoa Vermelha, Rio Grande do Sul.
               </p>
+              <a href="#sede" className="btn btn-apia-orange px-4 py-2 rounded-3 mt-4 d-inline-flex align-items-center gap-2">
+                <MapPin size={16} />
+                Conheça nossa sede
+              </a>
             </Col>
             <Col md={5} className="text-center text-md-end">
               <img
@@ -94,7 +113,79 @@ export const About = () => {
         </Container>
       </section>
 
-      {/* 3. Parceria IFSUL */}
+      {/* 3. Nossa Sede (destaque) */}
+      <section id="sede" className="py-5 sede-section">
+        <Container>
+          <Card className="bg-apia-dark text-white border-0 shadow-lg rounded-4 p-4 p-md-5">
+            <Row className="align-items-center g-4">
+              <Col md={7}>
+                <span className="text-uppercase small fw-bold" style={{ color: '#a7f3d0', letterSpacing: '0.08em' }}>
+                  Nossa Casa
+                </span>
+                <h2 className="h3 fw-bold mt-1 mb-3">Conheça a sede da APIA</h2>
+                <p className="text-light opacity-75 mb-3">
+                  A sede da APIA é o lugar onde a nossa causa ganha forma. Quer conhecer o espaço, visitar os animais ou adotar? Não temos horário fixo: os voluntários atendem conforme a disponibilidade de cada um, então basta combinar a visita com a gente.
+                </p>
+
+                {SEDE_ENDERECO && (
+                  <p className="mb-2 d-flex align-items-start gap-2">
+                    <MapPin size={18} className="mt-1 flex-shrink-0" />
+                    <span><strong>Endereço:</strong> {SEDE_ENDERECO}</span>
+                  </p>
+                )}
+                <p className="mb-4 d-flex align-items-start gap-2">
+                  <CalendarCheck size={18} className="mt-1 flex-shrink-0" />
+                  <span><strong>Visitas e adoções:</strong> a combinar</span>
+                </p>
+
+                <div className="d-flex flex-wrap gap-2">
+                  <a
+                    href={WHATSAPP_VISITA}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="btn btn-apia-orange px-4 py-2 rounded-3 d-inline-flex align-items-center gap-2"
+                  >
+                    <MessageCircle size={16} />
+                    Combinar visita
+                  </a>
+                  {SEDE_MAPS_URL && (
+                    <a
+                      href={SEDE_MAPS_URL}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="btn btn-outline-light px-4 py-2 rounded-3 d-inline-flex align-items-center gap-2"
+                    >
+                      <MapPin size={16} />
+                      Ver no mapa
+                    </a>
+                  )}
+                </div>
+              </Col>
+
+              <Col md={5}>
+                {FOTO_SEDE ? (
+                  <img
+                    src={FOTO_SEDE}
+                    alt="Sede da APIA em Lagoa Vermelha"
+                    className="img-fluid rounded-4 shadow w-100"
+                    style={{ height: '300px', objectFit: 'cover' }}
+                  />
+                ) : (
+                  <div
+                    className="rounded-4 d-flex flex-column align-items-center justify-content-center text-center"
+                    style={{ height: '300px', backgroundColor: 'rgba(255,255,255,0.1)' }}
+                  >
+                    <Home size={40} className="mb-2 opacity-75" />
+                    <span className="small opacity-75">Foto da sede em breve</span>
+                  </div>
+                )}
+              </Col>
+            </Row>
+          </Card>
+        </Container>
+      </section>
+
+      {/* 4. Parceria IFSUL */}
       <section className="py-5 border-top bg-light">
         <Container>
           <Card className="border-0 shadow-sm rounded-4 p-4">
@@ -132,7 +223,7 @@ export const About = () => {
         </Container>
       </section>
 
-      {/* 4. Canais de Contato */}
+      {/* 5. Canais de Contato */}
       <section className="py-5">
         <Container>
           <div className="text-center mb-4">

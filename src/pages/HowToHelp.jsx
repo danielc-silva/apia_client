@@ -1,4 +1,5 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
+import { Link } from 'react-router-dom';
 import Container from 'react-bootstrap/Container';
 import Row from 'react-bootstrap/Row';
 import Col from 'react-bootstrap/Col';
@@ -6,25 +7,76 @@ import Card from 'react-bootstrap/Card';
 import Form from 'react-bootstrap/Form';
 import Button from 'react-bootstrap/Button';
 import {
-  Heart,
-  Handshake,
   PawPrint,
-  Share2,
-  Gift,
-  Star,
   Copy,
   Check,
   MessageCircle,
   MapPin,
 } from 'lucide-react';
+import { api } from '../services/api.js';
+import { obterIcone } from '../utils/icones.js';
+import { PassoAPassoModal } from '../components/PassoAPassoModal.jsx';
 import bannerComoAjudarApia from '../assets/banner-como-ajudar-apia.png';
 import fotoMiagro from '../assets/miagro-loja.jpg';
 import fotoMercadoDeBone from '../assets/mercado-de-bone.png';
 import fotoAmorATerra from '../assets/amor-a-terra.jpg';
 
+const CLASSE_LINK_CARD = 'small fw-semibold text-apia-orange text-decoration-none';
+
+function LinkDoCard({ card, aoAbrirPassos }) {
+  if (card.stepsCount > 0) {
+    return (
+      <button
+        type="button"
+        onClick={() => aoAbrirPassos(card)}
+        className={`${CLASSE_LINK_CARD} p-0 border-0 bg-transparent text-start`}
+      >
+        {card.linkLabel || 'Ver passo a passo'} &rarr;
+      </button>
+    );
+  }
+
+  if (!card.linkUrl || !card.linkLabel) return null;
+
+  if (/^https?:\/\//i.test(card.linkUrl)) {
+    return (
+      <a href={card.linkUrl} target="_blank" rel="noopener noreferrer" className={CLASSE_LINK_CARD}>
+        {card.linkLabel} &rarr;
+      </a>
+    );
+  }
+  if (card.linkUrl.startsWith('/')) {
+    return (
+      <Link to={card.linkUrl} className={CLASSE_LINK_CARD}>
+        {card.linkLabel} &rarr;
+      </Link>
+    );
+  }
+  return (
+    <a href={card.linkUrl} className={CLASSE_LINK_CARD}>
+      {card.linkLabel} &rarr;
+    </a>
+  );
+}
+
 export const HowToHelp = () => {
   const [pixCopiado, setPixCopiado] = useState(false);
   const chavePix = '23.017.944/0001-77';
+
+  const [cardsAjuda, setCardsAjuda] = useState([]);
+  const [carregandoCards, setCarregandoCards] = useState(true);
+  const [erroCards, setErroCards] = useState(false);
+  const [cardPassos, setCardPassos] = useState(null);
+
+  useEffect(() => {
+    let ativo = true;
+    api
+      .buscarCardsAjuda()
+      .then((dados) => { if (ativo) setCardsAjuda(dados); })
+      .catch(() => { if (ativo) setErroCards(true); })
+      .finally(() => { if (ativo) setCarregandoCards(false); });
+    return () => { ativo = false; };
+  }, []);
 
   const [dadosFormulario, setDadosFormulario] = useState({
     name: '',
@@ -286,159 +338,47 @@ export const HowToHelp = () => {
         </Container>
       </section>
 
-      {/* 4. Formas de Colaborar */}
+      {/* 4. Formas de Colaborar (cards editáveis pelo painel admin) */}
       <section className="py-5 border-top">
         <Container>
           <h2 className="h5 fw-bold text-apia-dark mb-4">Formas de Colaborar</h2>
 
-          <Row className="g-4">
-            <Col sm={6} lg={4}>
-              <Card className="h-100 border-0 shadow-sm rounded-4 p-3">
-                <Card.Body className="d-flex flex-column justify-content-between">
-                  <div>
-                    <div
-                      className="rounded-3 bg-apia-light text-apia-dark d-flex align-items-center justify-content-center mb-3"
-                      style={{ width: '42px', height: '42px' }}
-                    >
-                      <Heart size={20} />
-                    </div>
-                    <h5 className="fw-bold fs-6 text-apia-dark">Doação Financeira</h5>
-                    <p className="small text-muted">
-                      Contribua para custear atendimentos veterinários, castrações, remédios e ração para os resgatados.
-                    </p>
-                  </div>
-                  <a href="#pix-section" className="small fw-semibold text-apia-orange text-decoration-none">
-                    Ver chave PIX &rarr;
-                  </a>
-                </Card.Body>
-              </Card>
-            </Col>
-
-            <Col sm={6} lg={4}>
-              <Card className="h-100 border-0 shadow-sm rounded-4 p-3">
-                <Card.Body className="d-flex flex-column justify-content-between">
-                  <div>
-                    <div
-                      className="rounded-3 bg-apia-light text-apia-dark d-flex align-items-center justify-content-center mb-3"
-                      style={{ width: '42px', height: '42px' }}
-                    >
-                      <Handshake size={20} />
-                    </div>
-                    <h5 className="fw-bold fs-6 text-apia-dark">Ser Voluntário</h5>
-                    <p className="small text-muted">
-                      Doe parte do seu tempo e carinho em ações de resgate, feiras de adoção, divulgação ou transporte.
-                    </p>
-                  </div>
-                  <a href="#voluntario-section" className="small fw-semibold text-apia-orange text-decoration-none">
-                    Preencher cadastro &rarr;
-                  </a>
-                </Card.Body>
-              </Card>
-            </Col>
-
-            <Col sm={6} lg={4}>
-              <Card className="h-100 border-0 shadow-sm rounded-4 p-3">
-                <Card.Body className="d-flex flex-column justify-content-between">
-                  <div>
-                    <div
-                      className="rounded-3 bg-apia-light text-apia-dark d-flex align-items-center justify-content-center mb-3"
-                      style={{ width: '42px', height: '42px' }}
-                    >
-                      <PawPrint size={20} />
-                    </div>
-                    <h5 className="fw-bold fs-6 text-apia-dark">Doar Ração e Suprimentos</h5>
-                    <p className="small text-muted">
-                      Sacos de ração para cães e gatos, caminhas, cobertores e produtos de limpeza são sempre bem-vindos.
-                    </p>
-                  </div>
-                  <a href="#pontos-coleta-section" className="small fw-semibold text-apia-orange text-decoration-none">
-                    Pontos de coleta &rarr;
-                  </a>
-                </Card.Body>
-              </Card>
-            </Col>
-
-            <Col sm={6} lg={4}>
-              <Card className="h-100 border-0 shadow-sm rounded-4 p-3">
-                <Card.Body className="d-flex flex-column justify-content-between">
-                  <div>
-                    <div
-                      className="rounded-3 bg-apia-light text-apia-dark d-flex align-items-center justify-content-center mb-3"
-                      style={{ width: '42px', height: '42px' }}
-                    >
-                      <Share2 size={20} />
-                    </div>
-                    <h5 className="fw-bold fs-6 text-apia-dark">Divulgar nas Redes</h5>
-                    <p className="small text-muted">
-                      Compartilhe as fotos dos nossos animais e ajude a encontrar novos lares responsáveis em Lagoa Vermelha.
-                    </p>
-                  </div>
-                  <a
-                    href="https://www.instagram.com/ongapia.oficial/"
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    className="small fw-semibold text-apia-orange text-decoration-none"
-                  >
-                    Instagram oficial &rarr;
-                  </a>
-                </Card.Body>
-              </Card>
-            </Col>
-
-            <Col sm={6} lg={4}>
-              <Card className="h-100 border-0 shadow-sm rounded-4 p-3">
-                <Card.Body className="d-flex flex-column justify-content-between">
-                  <div>
-                    <div
-                      className="rounded-3 bg-apia-light text-apia-dark d-flex align-items-center justify-content-center mb-3"
-                      style={{ width: '42px', height: '42px' }}
-                    >
-                      <Gift size={20} />
-                    </div>
-                    <h5 className="fw-bold fs-6 text-apia-dark">Apadrinhamento</h5>
-                    <p className="small text-muted">
-                      Ajude a manter os custos de um animal específico em lar temporário até a adoção definitiva.
-                    </p>
-                  </div>
-                  <a
-                    href="https://wa.me/5554996546910?text=Ol%C3%A1%20APIA!%20Gostaria%20de%20saber%20mais%20sobre%20o%20Apadrinhamento%20de%20um%20pet."
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    className="small fw-semibold text-apia-orange text-decoration-none"
-                  >
-                    Apadrinhar no WhatsApp &rarr;
-                  </a>
-                </Card.Body>
-              </Card>
-            </Col>
-
-            <Col sm={6} lg={4}>
-              <Card className="h-100 border-0 shadow-sm rounded-4 p-3">
-                <Card.Body className="d-flex flex-column justify-content-between">
-                  <div>
-                    <div
-                      className="rounded-3 bg-apia-light text-apia-dark d-flex align-items-center justify-content-center mb-3"
-                      style={{ width: '42px', height: '42px' }}
-                    >
-                      <Star size={20} />
-                    </div>
-                    <h5 className="fw-bold fs-6 text-apia-dark">Parcerias e Eventos</h5>
-                    <p className="small text-muted">
-                      Sua empresa ou comércio pode ser um ponto de arrecadação ou apoiar nossos eventos e bazares beneficentes.
-                    </p>
-                  </div>
-                  <a
-                    href="https://wa.me/5554996546910"
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    className="small fw-semibold text-apia-orange text-decoration-none"
-                  >
-                    Falar no WhatsApp &rarr;
-                  </a>
-                </Card.Body>
-              </Card>
-            </Col>
-          </Row>
+          {carregandoCards ? (
+            <p className="small text-muted mb-0">Carregando formas de colaborar...</p>
+          ) : erroCards ? (
+            <p className="small text-danger mb-0">
+              Não foi possível carregar as formas de colaborar no momento. Tente novamente mais tarde.
+            </p>
+          ) : cardsAjuda.length === 0 ? (
+            <p className="small text-muted mb-0">Em breve novas formas de colaborar por aqui.</p>
+          ) : (
+            <Row className="g-4">
+              {cardsAjuda.map((card) => {
+                const Icone = obterIcone(card.icon);
+                return (
+                  <Col sm={6} lg={4} key={card.id}>
+                    <Card className="h-100 border-0 shadow-sm rounded-4 p-3">
+                      <Card.Body className="d-flex flex-column justify-content-between">
+                        <div>
+                          <div
+                            className="rounded-3 bg-apia-light text-apia-dark d-flex align-items-center justify-content-center mb-3"
+                            style={{ width: '42px', height: '42px' }}
+                          >
+                            <Icone size={20} />
+                          </div>
+                          <h5 className="fw-bold fs-6 text-apia-dark">{card.title}</h5>
+                          <p className="small text-muted" style={{ whiteSpace: 'pre-line' }}>
+                            {card.description}
+                          </p>
+                        </div>
+                        <LinkDoCard card={card} aoAbrirPassos={setCardPassos} />
+                      </Card.Body>
+                    </Card>
+                  </Col>
+                );
+              })}
+            </Row>
+          )}
         </Container>
       </section>
 
@@ -614,6 +554,12 @@ export const HowToHelp = () => {
           </Card>
         </Container>
       </section>
+
+      <PassoAPassoModal
+        card={cardPassos}
+        isOpen={!!cardPassos}
+        onClose={() => setCardPassos(null)}
+      />
     </div>
   );
 };
